@@ -6,6 +6,17 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 
 ---
 
+## 📸 Screenshots
+
+| Dark Mode (Default) | Light Mode |
+| --- | --- |
+| ![Dark Mode](./screenshots/dark-mode.png) | ![Light Mode](./screenshots/light-mode.png) |
+
+### JSON Formatter Utility
+![JSON Formatter](./screenshots/json-formatter.png)
+
+---
+
 ## ✨ Features
 
 - ⚙️ **JSON Formatter & Validator**: Beautify (2/4 spaces or tabs), minify, and validate JSON inputs with instant syntax error locations.
