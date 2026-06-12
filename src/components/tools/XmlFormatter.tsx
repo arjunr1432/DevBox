@@ -4,9 +4,11 @@ import { Trash2, FileCode, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const formatXml = (xml: string, indentString = '  '): string => {
   let formatted = '';
+  // Clean up all whitespaces between tags first
+  const cleanXml = xml.replace(/>\s*</g, '><');
   // Split tags by newlines
   const reg = /(>)(<)(\/*)/g;
-  const wspaceXml = xml.replace(/\s+/g, ' ').replace(reg, '$1\r\n$2$3');
+  const wspaceXml = cleanXml.replace(reg, '$1\r\n$2$3');
   let pad = 0;
 
   wspaceXml.split('\r\n').forEach((line) => {
