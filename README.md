@@ -12,21 +12,27 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 | --- | --- |
 | ![Dark Mode](./screenshots/dark-mode.png) | ![Light Mode](./screenshots/light-mode.png) |
 
-### JSON Formatter Utility
-![JSON Formatter](./screenshots/json-formatter.png)
+### XML Formatter Utility
+![XML Formatter](./screenshots/xml-formatter.png)
 
 ---
 
 ## ✨ Features
 
 - ⚙️ **JSON Formatter & Validator**: Beautify (2/4 spaces or tabs), minify, and validate JSON inputs with instant syntax error locations.
-- 📦 **Base64 Encoder & Decoder**: Encode and decode text strings or drag-and-drop files (images, configs) to Base64 and HTML/CSS Data URL streams.
+- 📄 **XML Formatter**: Beautify, minify, and validate XML strings with indentation spacing and unbalanced tag checks.
+- 🖨️ **SQL Formatter**: Format and indent SQL queries supporting PostgreSQL, MySQL, SQLite, and Standard SQL dialects.
+- 📦 **Base64 Converter**: Encode and decode text strings or drag-and-drop files (images, configs) to Base64 and HTML/CSS Data URL streams.
 - ⏰ **Epoch Timestamp Converter**: A live-ticking UNIX timestamp banner with pause/copy functions, and bidirectional translation to UTC, Local, and Relative date formats.
+- 🔏 **HTML Entity Encoder**: Escape special HTML control characters to entity strings and decode entities back to plain text.
 - 🔑 **JWT Decoder**: Inspect JWT tokens, automatically dividing Header, Payload, and Signature metadata with expiry alerts and claims verification.
 - 🎯 **RegEx Match Tester**: Compile expressions in real-time, highlight matching nodes safely with infinite-loop prevention, and view matches list.
 - 🔒 **Cryptographic Hash Generator**: Generate MD5, SHA-1, SHA-256, and SHA-512 checksums instantly and locally.
-- 🎨 **Color Converter & Contrast Checker**: Convert colors between HEX, RGB, and HSL color spaces. Features a WCAG 2.1 contrast ratio calculator with compliance status badges (AA/AAA) for user interface accessibility.
-- 🔗 **URL Encoder / Decoder**: Safely encode query variables for URL routing, or decode percentage-encoded URI strings.
+- 🔑 **UUID & Key Generator**: Batch generate UUID v4 values or create strong custom password keys with strength indicators.
+- 🎨 **Color Converter & Contrast Checker**: Convert colors between HEX, RGB, and HSL spaces. Features a WCAG 2.1 contrast ratio calculator with compliance status badges (AA/AAA).
+- 🔀 **Text Diff Checker**: Compare text snippets side-by-side or inline using line or word diff highlighting.
+- 🔤 **String Case Converter**: Convert text casing between camelCase, snake_case, kebab-case, PascalCase, uppercase, and lowercase.
+- 📝 **Live Markdown Previewer**: Compose Markdown syntax and preview the rendered styled HTML output side-by-side.
 - 🌓 **macOS Light & Dark Themes**: Fully synchronized interface supporting a premium dark glassmorphism layout (default) and a crisp, clean light mode.
 
 ---
