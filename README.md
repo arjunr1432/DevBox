@@ -1,5 +1,7 @@
 # 🛠️ DevBox - Smart Developer Utility Box
 
+[![Download macOS App](https://img.shields.io/badge/Download-macOS%20App-blue?logo=apple&style=for-the-badge)](https://github.com/arjunr1432/DevBox/releases/latest/download/DevBox-macOS.zip)
+
 DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace.
 
 Built with **React, TypeScript, Vite, and Electron**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
@@ -44,6 +46,20 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 - **Icons**: Lucide React
 - **Desktop Shell**: Electron (CommonJS entrypoint using `.cjs`)
 - **Packager**: Electron Packager
+
+---
+
+## 📥 Direct Download (macOS)
+
+You can download the pre-packaged standalone macOS desktop application directly from the **GitHub Releases** page:
+
+👉 **[Download DevBox-macOS.zip](https://github.com/arjunr1432/DevBox/releases/latest/download/DevBox-macOS.zip)**
+
+### Installation Instructions
+1. Download the `DevBox-macOS.zip` archive.
+2. Double-click the file to extract **`DevBox.app`**.
+3. Drag **`DevBox.app`** into your `/Applications` folder.
+4. **macOS Gatekeeper Bypass**: Since the app is self-packaged and not signed with an Apple developer certificate, when opening it for the first time, macOS might show a warning. Right-click the app icon and select **Open**, then click **Open** in the confirmation dialog to bypass Gatekeeper.
 
 ---
 
