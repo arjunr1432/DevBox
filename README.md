@@ -2,6 +2,13 @@
 
 [![Download macOS App](https://img.shields.io/badge/Download-macOS%20App-blue?logo=apple&style=for-the-badge)](https://github.com/arjunr1432/DevBox/releases/latest/download/DevBox-macOS.zip)
 
+> [!IMPORTANT]
+> **First-Time macOS Launch Command:**
+> Since this app is self-packaged and unsigned, downloading it via a browser will trigger a macOS security message saying the app is *"damaged"*. Bypass this warning by running this command in your Terminal:
+> ```bash
+> xattr -cr /Applications/DevBox.app
+> ```
+
 DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace.
 
 Built with **React, TypeScript, Vite, and Electron**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
@@ -51,21 +58,25 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 
 ## 📥 Direct Download (macOS)
 
-You can download the pre-packaged standalone macOS desktop application directly from the **GitHub Releases** page:
-
 👉 **[Download DevBox-macOS.zip](https://github.com/arjunr1432/DevBox/releases/latest/download/DevBox-macOS.zip)**
 
+### macOS Gatekeeper Workaround (Required)
+Because this application is unsigned, downloading it via a web browser triggers the macOS security quarantine. This displays a warning message stating the app is *"damaged and can't be opened"*:
+
+![macOS Quarantine Warning](./screenshots/damaged-warning.png)
+
+To fix this and open the app, run the following command in your Terminal:
+```bash
+xattr -cr /Applications/DevBox.app
+```
+*(If you run the app from your Downloads folder instead, run `xattr -cr ~/Downloads/DevBox.app`)*.
+
 ### Installation Instructions
-1. Download the `DevBox-macOS.zip` archive.
+1. Download the **`DevBox-macOS.zip`** archive.
 2. Double-click the file to extract **`DevBox.app`**.
 3. Drag **`DevBox.app`** into your `/Applications` folder.
-4. **macOS Gatekeeper Bypass ("Damaged" App Error)**: Because the app is self-packaged and not signed with an Apple developer certificate, downloading it via a web browser triggers macOS's security quarantine. This causes macOS to display a message saying the app is *"damaged and can't be opened"*.
-
-   To fix this, open your Terminal and run the following command to remove the quarantine flag:
-   ```bash
-   xattr -cr /Applications/DevBox.app
-   ```
-   *(If you haven't moved the app to `/Applications` yet, run the command pointing to its current location, e.g., `xattr -cr ~/Downloads/DevBox.app`)*. Once executed, the app will open perfectly!
+4. Run the terminal command shown above.
+5. Open the app!
 
 
 ---
