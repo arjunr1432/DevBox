@@ -37,6 +37,7 @@ import { CaseConverter } from './components/tools/CaseConverter';
 import { SqlFormatter } from './components/tools/SqlFormatter';
 import { HtmlEncoder } from './components/tools/HtmlEncoder';
 import { MarkdownPreview } from './components/tools/MarkdownPreview';
+import { XmlFormatter } from './components/tools/XmlFormatter';
 
 const TOOLS: Tool[] = [
   {
@@ -52,6 +53,13 @@ const TOOLS: Tool[] = [
     description: 'Beautify and indent SQL queries',
     category: 'formatters',
     icon: 'Database'
+  },
+  {
+    id: 'xml-formatter',
+    name: 'XML Formatter',
+    description: 'Beautify, minify and validate XML',
+    category: 'formatters',
+    icon: 'FileCode'
   },
   {
     id: 'base64-converter',
@@ -207,6 +215,7 @@ function App() {
       case 'text-diff': return <TextDiff />;
       case 'case-converter': return <CaseConverter />;
       case 'markdown-preview': return <MarkdownPreview />;
+      case 'xml-formatter': return <XmlFormatter />;
       default: return <JsonFormatter />;
     }
   };

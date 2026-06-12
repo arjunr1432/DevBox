@@ -12,7 +12,8 @@ export type ToolId =
   | 'case-converter'
   | 'sql-formatter'
   | 'html-encoder'
-  | 'markdown-preview';
+  | 'markdown-preview'
+  | 'xml-formatter';
 
 export type ToolCategory =
   | 'formatters'
