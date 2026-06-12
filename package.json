@@ -13,12 +13,17 @@
     "package:mac": "npm run build && electron-packager . DevBox --overwrite --out=dist-app"
   },
   "dependencies": {
+    "diff": "^9.0.0",
     "lucide-react": "^1.17.0",
+    "marked": "^18.0.5",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "sql-formatter": "^15.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/diff": "^7.0.2",
+    "@types/marked": "^5.0.2",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

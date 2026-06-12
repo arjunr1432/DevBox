@@ -6,9 +6,22 @@ export type ToolId =
   | 'regex-tester'
   | 'hash-generator'
   | 'color-tool'
-  | 'url-encoder';
+  | 'url-encoder'
+  | 'text-diff'
+  | 'uuid-generator'
+  | 'case-converter'
+  | 'sql-formatter'
+  | 'html-encoder'
+  | 'markdown-preview';
 
-export type ToolCategory = 'formatters' | 'converters' | 'decoders' | 'cryptography' | 'design';
+export type ToolCategory =
+  | 'formatters'
+  | 'converters'
+  | 'decoders'
+  | 'cryptography'
+  | 'design'
+  | 'text'
+  | 'dev-helpers';
 
 export interface Tool {
   id: ToolId;

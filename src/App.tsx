@@ -10,17 +10,33 @@ import {
   Key,
   Terminal,
   Fingerprint,
-  Palette
+  Palette,
+  GitCompare,
+  Grid,
+  CaseSensitive,
+  Database,
+  FileCode,
+  FileEdit
 } from 'lucide-react';
 import type { Tool, ToolId, ToolCategory } from './types';
+
+// Original Tools
 import { JsonFormatter } from './components/tools/JsonFormatter';
 import { Base64Converter } from './components/tools/Base64Converter';
 import { EpochConverter } from './components/tools/EpochConverter';
+import { UrlEncoder } from './components/tools/UrlEncoder';
 import { JwtDecoder } from './components/tools/JwtDecoder';
 import { RegExTester } from './components/tools/RegExTester';
 import { HashGenerator } from './components/tools/HashGenerator';
 import { ColorTool } from './components/tools/ColorTool';
-import { UrlEncoder } from './components/tools/UrlEncoder';
+
+// New Tools
+import { TextDiff } from './components/tools/TextDiff';
+import { UuidGenerator } from './components/tools/UuidGenerator';
+import { CaseConverter } from './components/tools/CaseConverter';
+import { SqlFormatter } from './components/tools/SqlFormatter';
+import { HtmlEncoder } from './components/tools/HtmlEncoder';
+import { MarkdownPreview } from './components/tools/MarkdownPreview';
 
 const TOOLS: Tool[] = [
   {
@@ -29,6 +45,13 @@ const TOOLS: Tool[] = [
     description: 'Beautify, minify and validate JSON',
     category: 'formatters',
     icon: 'Braces'
+  },
+  {
+    id: 'sql-formatter',
+    name: 'SQL Formatter',
+    description: 'Beautify and indent SQL queries',
+    category: 'formatters',
+    icon: 'Database'
   },
   {
     id: 'base64-converter',
@@ -52,6 +75,13 @@ const TOOLS: Tool[] = [
     icon: 'Link'
   },
   {
+    id: 'html-encoder',
+    name: 'HTML Entity Encoder',
+    description: 'Escape and unescape HTML entity markup',
+    category: 'converters',
+    icon: 'FileCode'
+  },
+  {
     id: 'jwt-decoder',
     name: 'JWT Decoder',
     description: 'Decode and inspect JSON Web Tokens',
@@ -73,20 +103,50 @@ const TOOLS: Tool[] = [
     icon: 'Fingerprint'
   },
   {
+    id: 'uuid-generator',
+    name: 'UUID & Key Generator',
+    description: 'Batch generate UUID v4 and strong keys',
+    category: 'cryptography',
+    icon: 'Grid'
+  },
+  {
     id: 'color-tool',
     name: 'Color Space & Contrast',
     description: 'HEX/RGB/HSL conversion & WCAG checker',
     category: 'design',
     icon: 'Palette'
+  },
+  {
+    id: 'text-diff',
+    name: 'Text Diff Checker',
+    description: 'Compare original vs modified text side-by-side',
+    category: 'text',
+    icon: 'GitCompare'
+  },
+  {
+    id: 'case-converter',
+    name: 'Case Converter & Cleaner',
+    description: 'Change string cases and inspect counts',
+    category: 'text',
+    icon: 'CaseSensitive'
+  },
+  {
+    id: 'markdown-preview',
+    name: 'Markdown Previewer',
+    description: 'Live markdown rendering to styled HTML',
+    category: 'dev-helpers',
+    icon: 'FileEdit'
   }
 ];
 
 const CATEGORY_LABELS: Record<ToolCategory, string> = {
   formatters: 'Formatters',
-  converters: 'Converters',
-  decoders: 'Decoders',
-  cryptography: 'Cryptography',
-  design: 'Design & UX'
+  converters: 'Converters & Encoders',
+  decoders: 'Decoders & Parsers',
+  cryptography: 'Cryptography & Tokens',
+  design: 'Design & UX',
+  text: 'Text Utilities',
+  'dev-helpers': 'Developer Helpers'
 };
 
 function App() {
@@ -106,6 +166,12 @@ function App() {
       case 'Terminal': return <Terminal size={size} className="menu-icon" />;
       case 'Fingerprint': return <Fingerprint size={size} className="menu-icon" />;
       case 'Palette': return <Palette size={size} className="menu-icon" />;
+      case 'GitCompare': return <GitCompare size={size} className="menu-icon" />;
+      case 'Grid': return <Grid size={size} className="menu-icon" />;
+      case 'CaseSensitive': return <CaseSensitive size={size} className="menu-icon" />;
+      case 'Database': return <Database size={size} className="menu-icon" />;
+      case 'FileCode': return <FileCode size={size} className="menu-icon" />;
+      case 'FileEdit': return <FileEdit size={size} className="menu-icon" />;
       default: return <Terminal size={size} className="menu-icon" />;
     }
   };
@@ -128,13 +194,19 @@ function App() {
   const renderActiveToolComponent = () => {
     switch (activeToolId) {
       case 'json-formatter': return <JsonFormatter />;
+      case 'sql-formatter': return <SqlFormatter />;
       case 'base64-converter': return <Base64Converter />;
       case 'epoch-converter': return <EpochConverter />;
       case 'url-encoder': return <UrlEncoder />;
+      case 'html-encoder': return <HtmlEncoder />;
       case 'jwt-decoder': return <JwtDecoder />;
       case 'regex-tester': return <RegExTester />;
       case 'hash-generator': return <HashGenerator />;
+      case 'uuid-generator': return <UuidGenerator />;
       case 'color-tool': return <ColorTool />;
+      case 'text-diff': return <TextDiff />;
+      case 'case-converter': return <CaseConverter />;
+      case 'markdown-preview': return <MarkdownPreview />;
       default: return <JsonFormatter />;
     }
   };
@@ -156,7 +228,15 @@ function App() {
   }, {} as Record<ToolCategory, Tool[]>);
 
   // Categories listed in specific order
-  const categories: ToolCategory[] = ['formatters', 'converters', 'decoders', 'cryptography', 'design'];
+  const categories: ToolCategory[] = [
+    'formatters',
+    'converters',
+    'decoders',
+    'cryptography',
+    'text',
+    'design',
+    'dev-helpers'
+  ];
 
   return (
     <div className="desktop-wrapper">

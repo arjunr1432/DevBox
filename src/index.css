@@ -554,3 +554,149 @@ body {
   border-bottom: 2px solid var(--accent);
   border-radius: 2px;
 }
+
+/* Diff Viewer Styles */
+.diff-viewer {
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  border-radius: 8px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-line {
+  display: flex;
+  padding: 2px 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.diff-line.added {
+  background: rgba(16, 185, 129, 0.15);
+  border-left: 3px solid var(--success);
+}
+
+.diff-line.removed {
+  background: rgba(244, 63, 94, 0.15);
+  border-left: 3px solid var(--error);
+}
+
+.diff-line.normal {
+  border-left: 3px solid transparent;
+}
+
+.diff-prefix {
+  width: 20px;
+  user-select: none;
+  opacity: 0.5;
+  font-weight: 600;
+}
+
+.diff-text {
+  flex-grow: 1;
+}
+
+/* Password Strength Meter */
+.strength-bar-container {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.strength-bar {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-bar.weak {
+  background-color: var(--error);
+}
+
+.strength-bar.medium {
+  background-color: var(--warning);
+}
+
+.strength-bar.strong {
+  background-color: var(--success);
+}
+
+/* Markdown Preview Output styling */
+.markdown-preview-output {
+  padding: 16px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.markdown-preview-output h1,
+.markdown-preview-output h2,
+.markdown-preview-output h3 {
+  color: var(--text-primary);
+  margin-top: 18px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.markdown-preview-output h1 { font-size: 1.6em; }
+.markdown-preview-output h2 { font-size: 1.3em; }
+.markdown-preview-output h3 { font-size: 1.1em; }
+
+.markdown-preview-output p {
+  margin-bottom: 12px;
+}
+
+.markdown-preview-output ul,
+.markdown-preview-output ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.markdown-preview-output li {
+  margin-bottom: 4px;
+}
+
+.markdown-preview-output code {
+  background: var(--bg-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.markdown-preview-output pre {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  margin-bottom: 16px;
+}
+
+.markdown-preview-output pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.markdown-preview-output a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.markdown-preview-output a:hover {
+  text-decoration: underline;
+}
+
+.markdown-preview-output blockquote {
+  border-left: 4px solid var(--border-color);
+  padding-left: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-style: italic;
+}
