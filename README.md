@@ -59,7 +59,14 @@ You can download the pre-packaged standalone macOS desktop application directly 
 1. Download the `DevBox-macOS.zip` archive.
 2. Double-click the file to extract **`DevBox.app`**.
 3. Drag **`DevBox.app`** into your `/Applications` folder.
-4. **macOS Gatekeeper Bypass**: Since the app is self-packaged and not signed with an Apple developer certificate, when opening it for the first time, macOS might show a warning. Right-click the app icon and select **Open**, then click **Open** in the confirmation dialog to bypass Gatekeeper.
+4. **macOS Gatekeeper Bypass ("Damaged" App Error)**: Because the app is self-packaged and not signed with an Apple developer certificate, downloading it via a web browser triggers macOS's security quarantine. This causes macOS to display a message saying the app is *"damaged and can't be opened"*.
+
+   To fix this, open your Terminal and run the following command to remove the quarantine flag:
+   ```bash
+   xattr -cr /Applications/DevBox.app
+   ```
+   *(If you haven't moved the app to `/Applications` yet, run the command pointing to its current location, e.g., `xattr -cr ~/Downloads/DevBox.app`)*. Once executed, the app will open perfectly!
+
 
 ---
 
