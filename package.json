@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron": "electron .",
-    "package:mac": "npm run build && electron-packager . DevBox --overwrite --out=dist-app"
+    "package:mac": "npm run build && electron-packager . DevBox --overwrite --out=dist-app --ignore=\"(/node_modules|/src|/screenshots|/tsconfig|/vite.config|/eslint|\\\\.git|\\\\.gitignore|package-lock\\\\.json|/verify|/test|/dist-app|\\\\.zip)\""
   },
   "dependencies": {
     "diff": "^9.0.0",

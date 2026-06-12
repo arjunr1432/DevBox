@@ -127,6 +127,7 @@ body {
   user-select: none;
   position: relative;
   z-index: 10;
+  -webkit-app-region: drag; /* Allows dragging the Electron window */
 }
 
 /* macOS Window Controls (Traffic Lights) */
@@ -134,6 +135,7 @@ body {
   display: flex;
   gap: 8px;
   margin-right: 24px;
+  -webkit-app-region: no-drag; /* Prevents dragging interference on window controls */
 }
 
 .traffic-light {
@@ -192,6 +194,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: background var(--transition-speed), color var(--transition-speed);
+  -webkit-app-region: no-drag; /* Allows clicking the theme toggle button inside the draggable titlebar */
 }
 
 .theme-toggle:hover {
