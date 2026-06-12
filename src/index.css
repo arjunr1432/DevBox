@@ -114,8 +114,23 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  }
+
+/* Electron Environment Native Overrides */
+.desktop-wrapper.electron {
+  padding: 0;
+  background: none;
 }
+
+.mac-window.electron {
+  max-width: 100%;
+  max-height: 100vh;
+  height: 100vh;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
 
 /* Window Titlebar */
 .titlebar {

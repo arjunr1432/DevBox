@@ -248,8 +248,8 @@ function App() {
   ];
 
   return (
-    <div className="desktop-wrapper">
-      <div className="mac-window">
+    <div className={`desktop-wrapper ${isElectron ? 'electron' : ''}`}>
+      <div className={`mac-window ${isElectron ? 'electron' : ''}`}>
         {/* Titlebar */}
         <div className="titlebar">
           {isElectron ? (
