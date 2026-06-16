@@ -9,7 +9,7 @@
 > xattr -cr /Applications/DevBox.app
 > ```
 
-DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace.
+DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
 
 Built with **React, TypeScript, Vite, and Electron**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
 
@@ -28,6 +28,14 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 
 ## ✨ Features
 
+### 📋 Dashboard
+
+- ✅ **Task Board** (Landing Page): A persistent todo list with priority levels (low/medium/high), completion tracking, progress bar, and a Quick Notes scratchpad. All data is saved to localStorage immediately on every action — survives app crashes and restarts.
+- 📅 **Week Calendar**: Interactive weekly calendar showing the current week number, a navigatable monthly calendar with week numbers, year progress, quick stats (day of year, days remaining, quarter), and a today footer bar.
+- 🔔 **Sidebar Badges**: Live pending task count on the Task Board nav item and current week number on the Week Calendar.
+
+### 🧰 Developer Tools
+
 - ⚙️ **JSON Formatter & Validator**: Beautify (2/4 spaces or tabs), minify, and validate JSON inputs with instant syntax error locations.
 - 📄 **XML Formatter**: Beautify, minify, and validate XML strings with indentation spacing and unbalanced tag checks.
 - 🖨️ **SQL Formatter**: Format and indent SQL queries supporting PostgreSQL, MySQL, SQLite, and Standard SQL dialects.
@@ -42,17 +50,24 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 - 🔀 **Text Diff Checker**: Compare text snippets side-by-side or inline using line or word diff highlighting.
 - 🔤 **String Case Converter**: Convert text casing between camelCase, snake_case, kebab-case, PascalCase, uppercase, and lowercase.
 - 📝 **Live Markdown Previewer**: Compose Markdown syntax and preview the rendered styled HTML output side-by-side.
+
+### 🎨 UI & Design
+
 - 🌓 **macOS Light & Dark Themes**: Fully synchronized interface supporting a premium dark glassmorphism layout (default) and a crisp, clean light mode.
+- 💾 **Local Persistence**: Task Board and Quick Notes data persists across sessions via localStorage — no server, no account, no data loss.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Core**: React 19 + TypeScript
+- **Core**: React 19 + TypeScript 6
+- **Build**: Vite 8
 - **Styling**: Vanilla CSS (Responsive variables, glassmorphic blur filters, custom scrollbars, and macOS window styling)
 - **Icons**: Lucide React
-- **Desktop Shell**: Electron (CommonJS entrypoint using `.cjs`)
+- **Libraries**: `diff` (text diffing), `marked` (markdown), `sql-formatter` (SQL formatting)
+- **Desktop Shell**: Electron 42 (CommonJS entrypoint using `.cjs`)
 - **Packager**: Electron Packager
+- **Persistence**: localStorage (immediate writes, crash-safe)
 
 ---
 
@@ -77,7 +92,6 @@ xattr -cr /Applications/DevBox.app
 3. Drag **`DevBox.app`** into your `/Applications` folder.
 4. Run the terminal command shown above.
 5. Open the app!
-
 
 ---
 
@@ -128,4 +142,5 @@ This compiles your static assets and outputs a folder under `dist-app/` matching
 DevBox is designed with a **privacy-first** approach:
 - All tools execute **100% locally** in the browser runtime or Electron thread.
 - Your code snippets, passwords, tokens, API configurations, and file uploads never leave your computer's CPU.
+- Task data and notes are stored in localStorage on your machine — never synced or transmitted anywhere.
 - Fully operational offline.
