@@ -9,9 +9,9 @@
 > xattr -cr /Applications/DevBox.app
 > ```
 
-DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
+DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates 17 essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
 
-Built with **React, TypeScript, Vite, and Electron**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
+Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
 
 ---
 
@@ -21,18 +21,15 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 | --- | --- |
 | ![Dark Mode](./screenshots/dark-mode.png) | ![Light Mode](./screenshots/light-mode.png) |
 
-### XML Formatter Utility
-![XML Formatter](./screenshots/xml-formatter.png)
-
 ---
 
 ## ✨ Features
 
-### 📋 Dashboard
+### 📋 Dashboard (Landing Experience)
 
-- ✅ **Task Board** (Landing Page): A persistent todo list with priority levels (low/medium/high), completion tracking, progress bar, and a Quick Notes scratchpad. All data is saved to localStorage immediately on every action — survives app crashes and restarts.
-- 📅 **Week Calendar**: Interactive weekly calendar showing the current week number, a navigatable monthly calendar with week numbers, year progress, quick stats (day of year, days remaining, quarter), and a today footer bar.
-- 🔔 **Sidebar Badges**: Live pending task count on the Task Board nav item and current week number on the Week Calendar.
+- ✅ **Task Board** (Default Landing Page): A persistent todo list with priority levels (low/medium/high), color-coded task cards, completion tracking with progress bar, filter by status, and a Quick Notes scratchpad for urgent scribbles. All data is saved to localStorage immediately on every action — survives app crashes, refreshes, and restarts.
+- 📅 **Week Calendar**: Interactive weekly view showing the current week number and day highlights, a fully navigatable monthly calendar with week numbers in every row, year progress bar, quick stats (day of year, days remaining, quarter, leap year), and a today footer bar with live epoch time.
+- 🔔 **Sidebar Badges**: Live pending task count badge on the Task Board and current week number badge on the Week Calendar — always visible in the navigation.
 
 ### 🧰 Developer Tools
 
@@ -53,8 +50,10 @@ Built with **React, TypeScript, Vite, and Electron**, it runs completely locally
 
 ### 🎨 UI & Design
 
-- 🌓 **macOS Light & Dark Themes**: Fully synchronized interface supporting a premium dark glassmorphism layout (default) and a crisp, clean light mode.
-- 💾 **Local Persistence**: Task Board and Quick Notes data persists across sessions via localStorage — no server, no account, no data loss.
+- 🌓 **macOS Light & Dark Themes**: Fully synchronized interface supporting a premium dark glassmorphism layout (default) and a crisp, clean light mode — toggled from the titlebar.
+- �️ **Native macOS Feel**: Custom titlebar with traffic lights, breadcrumb navigation, draggable window, and Electron-aware full-viewport mode.
+- �💾 **Local Persistence**: Task Board and Quick Notes data persists across sessions via localStorage — no server, no account, no data loss.
+- 🔍 **Tool Search**: Fuzzy search across all tools from the sidebar for quick access.
 
 ---
 
