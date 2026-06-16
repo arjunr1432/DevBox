@@ -157,26 +157,26 @@ export const WeekCalendar: React.FC = () => {
         </div>
       </div>
 
-      {/* Middle: Calendar + Stats side by side — content-sized, no flex-grow */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: '12px' }}>
+      {/* Middle: Calendar + Stats side by side — stretch to fill */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: '12px', flex: 1, minHeight: 0 }}>
         {/* Calendar */}
-        <div className="tool-card" style={{ padding: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div className="tool-card" style={{ padding: '14px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button onClick={() => navigateMonth(-1)} className="btn btn-secondary" style={{ padding: '4px 6px', borderRadius: '6px' }}><ChevronLeft size={14} /></button>
-              <h2 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, minWidth: '130px', textAlign: 'center' }}>{MONTH_NAMES[calendarMonth]} {calendarYear}</h2>
+              <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, minWidth: '130px', textAlign: 'center' }}>{MONTH_NAMES[calendarMonth]} {calendarYear}</h2>
               <button onClick={() => navigateMonth(1)} className="btn btn-secondary" style={{ padding: '4px 6px', borderRadius: '6px' }}><ChevronRight size={14} /></button>
             </div>
-            <button onClick={goToToday} className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }}>Today</button>
+            <button onClick={goToToday} className="btn btn-secondary" style={{ padding: '5px 12px', fontSize: '11px' }}>Today</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '28px repeat(7, 1fr)', gap: '1px' }}>
-            <div style={{ padding: '3px 2px', textAlign: 'center', fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)' }}>WK</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '30px repeat(7, 1fr)', gap: '2px', flex: 1, alignContent: 'stretch' }}>
+            <div style={{ padding: '6px 2px', textAlign: 'center', fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>WK</div>
             {DAY_NAMES_SHORT.map(day => (
-              <div key={day} style={{ padding: '3px 2px', textAlign: 'center', fontSize: '9px', fontWeight: 700, color: (day === 'Sat' || day === 'Sun') ? 'var(--error)' : 'var(--text-muted)', textTransform: 'uppercase' }}>{day}</div>
+              <div key={day} style={{ padding: '6px 2px', textAlign: 'center', fontSize: '10px', fontWeight: 700, color: (day === 'Sat' || day === 'Sun') ? 'var(--error)' : 'var(--text-muted)', textTransform: 'uppercase' }}>{day}</div>
             ))}
             {calendarWeeks.map((week, weekIdx) => (
               <React.Fragment key={weekIdx}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 700, color: week.weekNum === weekNumber ? 'var(--accent)' : 'var(--text-muted)', background: week.weekNum === weekNumber ? 'rgba(168, 85, 247, 0.12)' : 'transparent', borderRadius: '4px' }}>{week.weekNum}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: week.weekNum === weekNumber ? 'var(--accent)' : 'var(--text-muted)', background: week.weekNum === weekNumber ? 'rgba(168, 85, 247, 0.12)' : 'transparent', borderRadius: '4px' }}>{week.weekNum}</div>
                 {week.cells.map((cell, dayIdx) => {
                   const isCurrentDay = isSameDay(cell.date, today);
                   const inCurrentWeek = isInCurrentWeek(cell.date);
@@ -184,7 +184,7 @@ export const WeekCalendar: React.FC = () => {
                   const isOtherMonth = cell.month !== 'current';
                   return (
                     <div key={dayIdx} style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px 2px', borderRadius: '5px', fontSize: '11px', fontWeight: isCurrentDay ? 800 : 500, cursor: 'default',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 2px', borderRadius: '6px', fontSize: '13px', fontWeight: isCurrentDay ? 800 : 500, cursor: 'default',
                       color: isCurrentDay ? '#ffffff' : isOtherMonth ? 'var(--text-muted)' : isWeekend ? 'rgba(244, 63, 94, 0.8)' : 'var(--text-primary)',
                       background: isCurrentDay ? 'var(--accent)' : inCurrentWeek && !isOtherMonth ? 'rgba(168, 85, 247, 0.08)' : 'transparent',
                       border: inCurrentWeek && !isCurrentDay && !isOtherMonth ? '1px solid rgba(168, 85, 247, 0.15)' : '1px solid transparent',
@@ -197,25 +197,26 @@ export const WeekCalendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Stats — Year Progress + Quick Stats only */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div className="tool-card" style={{ padding: '10px 12px' }}>
-            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' }}>Year Progress</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
-              <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{yearProgress}%</span>
-              <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{today.getFullYear()}</span>
+        {/* Right Stats — Year Progress + Quick Stats */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="tool-card" style={{ padding: '12px 14px' }}>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Year Progress</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+              <span style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>{yearProgress}%</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{today.getFullYear()}</span>
             </div>
-            <div style={{ height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${yearProgress}%`, background: 'linear-gradient(90deg, var(--accent), #818cf8)', borderRadius: '2px' }} />
+            <div style={{ height: '5px', background: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${yearProgress}%`, background: 'linear-gradient(90deg, var(--accent), #818cf8)', borderRadius: '3px' }} />
             </div>
           </div>
-          <div className="tool-card" style={{ padding: '10px 12px', flex: 1 }}>
-            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Quick Stats</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Day of Year</span><span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{dayOfYear}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Days Remaining</span><span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.ceil(daysLeft)}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Week Number</span><span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>W{weekNumber}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Quarter</span><span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>Q{Math.ceil((today.getMonth() + 1) / 3)}</span></div>
+          <div className="tool-card" style={{ padding: '12px 14px', flex: 1 }}>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>Quick Stats</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Day of Year</span><span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{dayOfYear}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Days Remaining</span><span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.ceil(daysLeft)}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Week Number</span><span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>W{weekNumber}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Quarter</span><span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>Q{Math.ceil((today.getMonth() + 1) / 3)}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Leap Year</span><span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{(today.getFullYear() % 4 === 0 && (today.getFullYear() % 100 !== 0 || today.getFullYear() % 400 === 0)) ? 'Yes' : 'No'}</span></div>
             </div>
           </div>
         </div>
