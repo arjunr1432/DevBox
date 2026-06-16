@@ -145,17 +145,17 @@ export const WeekCalendar: React.FC = () => {
   };
 
   return (
-    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '20px' }}>
-      {/* Greeting Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '12px', overflow: 'hidden' }}>
+      {/* Greeting Header — compact */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
             {getGreetingIcon()}
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+            <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
               {getGreeting()}
             </h1>
           </div>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>
             {today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
@@ -163,13 +163,13 @@ export const WeekCalendar: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '10px 16px',
+          padding: '8px 14px',
           background: 'rgba(168, 85, 247, 0.1)',
           border: '1px solid rgba(168, 85, 247, 0.25)',
           borderRadius: '10px'
         }}>
-          <Clock size={16} style={{ color: 'var(--accent)' }} />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '1px' }}>
+          <Clock size={14} style={{ color: 'var(--accent)' }} />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '1px' }}>
             {formatTime(currentTime)}
           </span>
         </div>
@@ -179,8 +179,8 @@ export const WeekCalendar: React.FC = () => {
       <div style={{
         background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%)',
         border: '1px solid rgba(168, 85, 247, 0.2)',
-        borderRadius: '14px',
-        padding: '20px 24px',
+        borderRadius: '12px',
+        padding: '12px 16px',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -189,22 +189,22 @@ export const WeekCalendar: React.FC = () => {
           position: 'absolute',
           top: '-50%',
           right: '-10%',
-          width: '200px',
-          height: '200px',
+          width: '150px',
+          height: '150px',
           background: 'radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%)',
           pointerEvents: 'none'
         }} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Calendar size={18} style={{ color: 'var(--accent)' }} />
-            <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>This Week</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Calendar size={14} style={{ color: 'var(--accent)' }} />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>This Week</span>
           </div>
           <div style={{
-            padding: '5px 14px',
+            padding: '3px 10px',
             background: 'var(--accent)',
-            borderRadius: '20px',
-            fontSize: '12px',
+            borderRadius: '14px',
+            fontSize: '10px',
             fontWeight: 700,
             color: '#fff',
             letterSpacing: '0.5px'
@@ -213,7 +213,7 @@ export const WeekCalendar: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', position: 'relative' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', position: 'relative' }}>
           {weekDates.map((date, idx) => {
             const isToday = isSameDay(date, today);
             const isWeekend = idx >= 5;
@@ -222,28 +222,24 @@ export const WeekCalendar: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                padding: '12px 8px',
-                borderRadius: '12px',
-                background: isToday
-                  ? 'var(--accent)'
-                  : 'rgba(255, 255, 255, 0.04)',
+                padding: '8px 4px',
+                borderRadius: '10px',
+                background: isToday ? 'var(--accent)' : 'rgba(255, 255, 255, 0.04)',
                 border: isToday ? 'none' : '1px solid rgba(255, 255, 255, 0.06)',
-                transition: 'all 0.2s ease',
-                cursor: 'default',
-                boxShadow: isToday ? '0 4px 20px rgba(168, 85, 247, 0.4)' : 'none'
+                boxShadow: isToday ? '0 4px 16px rgba(168, 85, 247, 0.4)' : 'none'
               }}>
                 <span style={{
-                  fontSize: '11px',
+                  fontSize: '10px',
                   fontWeight: 600,
                   color: isToday ? 'rgba(255,255,255,0.8)' : isWeekend ? 'var(--error)' : 'var(--text-muted)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  marginBottom: '6px'
+                  marginBottom: '3px'
                 }}>
                   {DAY_NAMES_SHORT[idx]}
                 </span>
                 <span style={{
-                  fontSize: '20px',
+                  fontSize: '16px',
                   fontWeight: 800,
                   color: isToday ? '#ffffff' : 'var(--text-primary)',
                   lineHeight: 1
@@ -251,9 +247,9 @@ export const WeekCalendar: React.FC = () => {
                   {date.getDate()}
                 </span>
                 <span style={{
-                  fontSize: '10px',
+                  fontSize: '9px',
                   color: isToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)',
-                  marginTop: '4px'
+                  marginTop: '2px'
                 }}>
                   {MONTH_NAMES[date.getMonth()].slice(0, 3)}
                 </span>
@@ -264,50 +260,49 @@ export const WeekCalendar: React.FC = () => {
       </div>
 
       {/* Bottom Section: Calendar + Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '16px', flexGrow: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '12px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {/* Navigatable Calendar */}
-        <div className="tool-card" style={{ padding: '18px', overflow: 'hidden' }}>
+        <div className="tool-card" style={{ padding: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {/* Calendar Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 onClick={() => navigateMonth(-1)}
                 className="btn btn-secondary"
-                style={{ padding: '6px 8px', borderRadius: '8px' }}
+                style={{ padding: '4px 6px', borderRadius: '6px' }}
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={14} />
               </button>
-              <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, minWidth: '160px', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, minWidth: '130px', textAlign: 'center' }}>
                 {MONTH_NAMES[calendarMonth]} {calendarYear}
               </h2>
               <button
                 onClick={() => navigateMonth(1)}
                 className="btn btn-secondary"
-                style={{ padding: '6px 8px', borderRadius: '8px' }}
+                style={{ padding: '4px 6px', borderRadius: '6px' }}
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={14} />
               </button>
             </div>
-            <button onClick={goToToday} className="btn btn-secondary" style={{ padding: '6px 14px', fontSize: '12px' }}>
+            <button onClick={goToToday} className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }}>
               Today
             </button>
           </div>
 
           {/* Calendar Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '36px repeat(7, 1fr)', gap: '2px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '28px repeat(7, 1fr)', gap: '1px', flex: 1, alignContent: 'start' }}>
             {/* Header Row */}
-            <div style={{ padding: '6px 2px', textAlign: 'center', fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>
+            <div style={{ padding: '3px 2px', textAlign: 'center', fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)' }}>
               WK
             </div>
             {DAY_NAMES_SHORT.map(day => (
               <div key={day} style={{
-                padding: '6px 2px',
+                padding: '3px 2px',
                 textAlign: 'center',
-                fontSize: '11px',
+                fontSize: '9px',
                 fontWeight: 700,
                 color: (day === 'Sat' || day === 'Sun') ? 'var(--error)' : 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                textTransform: 'uppercase'
               }}>
                 {day}
               </div>
@@ -316,20 +311,18 @@ export const WeekCalendar: React.FC = () => {
             {/* Calendar Rows */}
             {calendarWeeks.map((week, weekIdx) => (
               <React.Fragment key={weekIdx}>
-                {/* Week Number */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
+                  fontSize: '9px',
                   fontWeight: 700,
                   color: week.weekNum === weekNumber ? 'var(--accent)' : 'var(--text-muted)',
                   background: week.weekNum === weekNumber ? 'rgba(168, 85, 247, 0.12)' : 'transparent',
-                  borderRadius: '6px'
+                  borderRadius: '4px'
                 }}>
                   {week.weekNum}
                 </div>
-                {/* Days */}
                 {week.cells.map((cell, dayIdx) => {
                   const isCurrentDay = isSameDay(cell.date, today);
                   const inCurrentWeek = isInCurrentWeek(cell.date);
@@ -341,12 +334,11 @@ export const WeekCalendar: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '8px 4px',
-                      borderRadius: '8px',
-                      fontSize: '13px',
+                      padding: '4px 2px',
+                      borderRadius: '5px',
+                      fontSize: '11px',
                       fontWeight: isCurrentDay ? 800 : 500,
                       cursor: 'default',
-                      position: 'relative',
                       color: isCurrentDay
                         ? '#ffffff'
                         : isOtherMonth
@@ -362,8 +354,7 @@ export const WeekCalendar: React.FC = () => {
                       border: inCurrentWeek && !isCurrentDay && !isOtherMonth
                         ? '1px solid rgba(168, 85, 247, 0.15)'
                         : '1px solid transparent',
-                      boxShadow: isCurrentDay ? '0 2px 12px rgba(168, 85, 247, 0.4)' : 'none',
-                      transition: 'all 0.15s ease'
+                      boxShadow: isCurrentDay ? '0 2px 8px rgba(168, 85, 247, 0.4)' : 'none'
                     }}>
                       {cell.day}
                     </div>
@@ -374,100 +365,73 @@ export const WeekCalendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Stats Panel — compact */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minHeight: 0, overflow: 'hidden' }}>
           {/* Year Progress */}
-          <div className="tool-card" style={{ padding: '16px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+          <div className="tool-card" style={{ padding: '10px 12px' }}>
+            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' }}>
               Year Progress
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)' }}>{yearProgress}%</span>
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{today.getFullYear()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
+              <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{yearProgress}%</span>
+              <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{today.getFullYear()}</span>
             </div>
-            <div style={{
-              height: '6px',
-              background: 'var(--border-color)',
-              borderRadius: '3px',
-              overflow: 'hidden'
-            }}>
+            <div style={{ height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
                 width: `${yearProgress}%`,
                 background: 'linear-gradient(90deg, var(--accent), #818cf8)',
-                borderRadius: '3px',
-                transition: 'width 0.5s ease'
+                borderRadius: '2px'
               }} />
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="tool-card" style={{ padding: '16px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
+          <div className="tool-card" style={{ padding: '10px 12px' }}>
+            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
               Quick Stats
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Day of Year</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{dayOfYear}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Day of Year</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{dayOfYear}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Days Remaining</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.ceil(daysLeft)}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Days Remaining</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{Math.ceil(daysLeft)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Week Number</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>W{weekNumber}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Week Number</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>W{weekNumber}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Quarter</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>Q{Math.ceil((today.getMonth() + 1) / 3)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Leap Year</span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-                  {(today.getFullYear() % 4 === 0 && (today.getFullYear() % 100 !== 0 || today.getFullYear() % 400 === 0)) ? 'Yes' : 'No'}
-                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Quarter</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>Q{Math.ceil((today.getMonth() + 1) / 3)}</span>
               </div>
             </div>
           </div>
 
-          {/* Today Details */}
-          <div className="tool-card" style={{ padding: '16px', flexGrow: 1 }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
+          {/* Today Details — compact */}
+          <div className="tool-card" style={{ padding: '10px 12px', flex: 1, minHeight: 0 }}>
+            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
               Today
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{
-                padding: '10px 12px',
-                background: 'rgba(168, 85, 247, 0.08)',
-                borderRadius: '8px',
-                borderLeft: '3px solid var(--accent)'
-              }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Full Date</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {DAY_NAMES_FULL[today.getDay() === 0 ? 6 : today.getDay() - 1]}, {MONTH_NAMES[today.getMonth()]} {today.getDate()}, {today.getFullYear()}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <div style={{ padding: '6px 8px', background: 'rgba(168, 85, 247, 0.08)', borderRadius: '5px', borderLeft: '2px solid var(--accent)' }}>
+                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Full Date</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {DAY_NAMES_FULL[today.getDay() === 0 ? 6 : today.getDay() - 1]}, {MONTH_NAMES[today.getMonth()]} {today.getDate()}
                 </div>
               </div>
-              <div style={{
-                padding: '10px 12px',
-                background: 'rgba(16, 185, 129, 0.08)',
-                borderRadius: '8px',
-                borderLeft: '3px solid var(--success)'
-              }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Week Range</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              <div style={{ padding: '6px 8px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '5px', borderLeft: '2px solid var(--success)' }}>
+                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Week Range</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>
                   {MONTH_NAMES[weekDates[0].getMonth()].slice(0, 3)} {weekDates[0].getDate()} – {MONTH_NAMES[weekDates[6].getMonth()].slice(0, 3)} {weekDates[6].getDate()}
                 </div>
               </div>
-              <div style={{
-                padding: '10px 12px',
-                background: 'rgba(251, 191, 36, 0.08)',
-                borderRadius: '8px',
-                borderLeft: '3px solid var(--warning)'
-              }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Unix Epoch</div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ padding: '6px 8px', background: 'rgba(251, 191, 36, 0.08)', borderRadius: '5px', borderLeft: '2px solid var(--warning)' }}>
+                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Unix Epoch</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                   {Math.floor(currentTime.getTime() / 1000)}
                 </div>
               </div>

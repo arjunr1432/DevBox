@@ -47,18 +47,18 @@ import { XmlFormatter } from './components/tools/XmlFormatter';
 
 const TOOLS: Tool[] = [
   {
-    id: 'week-calendar',
-    name: 'Week Calendar',
-    description: 'Interactive weekly calendar with stats',
-    category: 'dashboard',
-    icon: 'CalendarDays'
-  },
-  {
     id: 'todo-list',
     name: 'Task Board',
     description: 'Persistent todo list and quick notes',
     category: 'dashboard',
     icon: 'ListTodo'
+  },
+  {
+    id: 'week-calendar',
+    name: 'Week Calendar',
+    description: 'Interactive weekly calendar with stats',
+    category: 'dashboard',
+    icon: 'CalendarDays'
   },
   {
     id: 'json-formatter',
@@ -179,7 +179,7 @@ const CATEGORY_LABELS: Record<ToolCategory, string> = {
 };
 
 function App() {
-  const [activeToolId, setActiveToolId] = useState<ToolId>('week-calendar');
+  const [activeToolId, setActiveToolId] = useState<ToolId>('todo-list');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const isElectron = navigator.userAgent.toLowerCase().includes('electron');
