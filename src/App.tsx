@@ -16,7 +16,8 @@ import {
   CaseSensitive,
   Database,
   FileCode,
-  FileEdit
+  FileEdit,
+  CalendarDays
 } from 'lucide-react';
 import type { Tool, ToolId, ToolCategory } from './types';
 
@@ -30,6 +31,9 @@ import { RegExTester } from './components/tools/RegExTester';
 import { HashGenerator } from './components/tools/HashGenerator';
 import { ColorTool } from './components/tools/ColorTool';
 
+// Dashboard
+import { WeekCalendar } from './components/tools/WeekCalendar';
+
 // New Tools
 import { TextDiff } from './components/tools/TextDiff';
 import { UuidGenerator } from './components/tools/UuidGenerator';
@@ -40,6 +44,13 @@ import { MarkdownPreview } from './components/tools/MarkdownPreview';
 import { XmlFormatter } from './components/tools/XmlFormatter';
 
 const TOOLS: Tool[] = [
+  {
+    id: 'week-calendar',
+    name: 'Week Calendar',
+    description: 'Interactive weekly calendar with stats',
+    category: 'dashboard',
+    icon: 'CalendarDays'
+  },
   {
     id: 'json-formatter',
     name: 'JSON Formatter',
@@ -148,6 +159,7 @@ const TOOLS: Tool[] = [
 ];
 
 const CATEGORY_LABELS: Record<ToolCategory, string> = {
+  dashboard: 'Dashboard',
   formatters: 'Formatters',
   converters: 'Converters & Encoders',
   decoders: 'Decoders & Parsers',
@@ -158,7 +170,7 @@ const CATEGORY_LABELS: Record<ToolCategory, string> = {
 };
 
 function App() {
-  const [activeToolId, setActiveToolId] = useState<ToolId>('json-formatter');
+  const [activeToolId, setActiveToolId] = useState<ToolId>('week-calendar');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const isElectron = navigator.userAgent.toLowerCase().includes('electron');
@@ -166,6 +178,7 @@ function App() {
   // Render proper icon based on string
   const renderIcon = (iconName: string, size = 16) => {
     switch (iconName) {
+      case 'CalendarDays': return <CalendarDays size={size} className="menu-icon" />;
       case 'Braces': return <Braces size={size} className="menu-icon" />;
       case 'Binary': return <Binary size={size} className="menu-icon" />;
       case 'Clock': return <Clock size={size} className="menu-icon" />;
@@ -201,6 +214,7 @@ function App() {
   // Render Tool Component
   const renderActiveToolComponent = () => {
     switch (activeToolId) {
+      case 'week-calendar': return <WeekCalendar />;
       case 'json-formatter': return <JsonFormatter />;
       case 'sql-formatter': return <SqlFormatter />;
       case 'base64-converter': return <Base64Converter />;
@@ -238,6 +252,7 @@ function App() {
 
   // Categories listed in specific order
   const categories: ToolCategory[] = [
+    'dashboard',
     'formatters',
     'converters',
     'decoders',

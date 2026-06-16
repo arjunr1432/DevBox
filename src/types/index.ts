@@ -1,4 +1,5 @@
 export type ToolId =
+  | 'week-calendar'
   | 'json-formatter'
   | 'base64-converter'
   | 'epoch-converter'
@@ -16,6 +17,7 @@ export type ToolId =
   | 'xml-formatter';
 
 export type ToolCategory =
+  | 'dashboard'
   | 'formatters'
   | 'converters'
   | 'decoders'
