@@ -1,5 +1,6 @@
 export type ToolId =
   | 'week-calendar'
+  | 'todo-list'
   | 'json-formatter'
   | 'base64-converter'
   | 'epoch-converter'

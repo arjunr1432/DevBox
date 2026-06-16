@@ -17,7 +17,8 @@ import {
   Database,
   FileCode,
   FileEdit,
-  CalendarDays
+  CalendarDays,
+  ListTodo
 } from 'lucide-react';
 import type { Tool, ToolId, ToolCategory } from './types';
 
@@ -33,6 +34,7 @@ import { ColorTool } from './components/tools/ColorTool';
 
 // Dashboard
 import { WeekCalendar } from './components/tools/WeekCalendar';
+import { TodoList } from './components/tools/TodoList';
 
 // New Tools
 import { TextDiff } from './components/tools/TextDiff';
@@ -50,6 +52,13 @@ const TOOLS: Tool[] = [
     description: 'Interactive weekly calendar with stats',
     category: 'dashboard',
     icon: 'CalendarDays'
+  },
+  {
+    id: 'todo-list',
+    name: 'Task Board',
+    description: 'Persistent todo list and quick notes',
+    category: 'dashboard',
+    icon: 'ListTodo'
   },
   {
     id: 'json-formatter',
@@ -179,6 +188,7 @@ function App() {
   const renderIcon = (iconName: string, size = 16) => {
     switch (iconName) {
       case 'CalendarDays': return <CalendarDays size={size} className="menu-icon" />;
+      case 'ListTodo': return <ListTodo size={size} className="menu-icon" />;
       case 'Braces': return <Braces size={size} className="menu-icon" />;
       case 'Binary': return <Binary size={size} className="menu-icon" />;
       case 'Clock': return <Clock size={size} className="menu-icon" />;
@@ -215,6 +225,7 @@ function App() {
   const renderActiveToolComponent = () => {
     switch (activeToolId) {
       case 'week-calendar': return <WeekCalendar />;
+      case 'todo-list': return <TodoList />;
       case 'json-formatter': return <JsonFormatter />;
       case 'sql-formatter': return <SqlFormatter />;
       case 'base64-converter': return <Base64Converter />;
