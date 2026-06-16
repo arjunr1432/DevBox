@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   Sun,
@@ -184,6 +184,36 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
+  // Pending task count from localStorage
+  const [pendingTasks, setPendingTasks] = useState(0);
+
+  useEffect(() => {
+    const updatePendingCount = () => {
+      try {
+        const raw = localStorage.getItem('devbox-todos');
+        if (raw) {
+          const todos = JSON.parse(raw);
+          setPendingTasks(todos.filter((t: any) => !t.completed).length);
+        }
+      } catch { /* ignore */ }
+    };
+    updatePendingCount();
+    // Listen for storage changes (from other tabs) and poll for same-tab updates
+    window.addEventListener('storage', updatePendingCount);
+    const interval = setInterval(updatePendingCount, 1000);
+    return () => { window.removeEventListener('storage', updatePendingCount); clearInterval(interval); };
+  }, []);
+
+  // Current week number
+  const currentWeekNumber = (() => {
+    const d = new Date();
+    const utcDate = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = utcDate.getUTCDay() || 7;
+    utcDate.setUTCDate(utcDate.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+    return Math.ceil(((utcDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  })();
+
   // Render proper icon based on string
   const renderIcon = (iconName: string, size = 16) => {
     switch (iconName) {
@@ -333,7 +363,35 @@ function App() {
                       onClick={() => setActiveToolId(tool.id)}
                     >
                       {renderIcon(tool.icon)}
-                      <span>{tool.name}</span>
+                      <span style={{ flex: 1 }}>{tool.name}</span>
+                      {tool.id === 'todo-list' && pendingTasks > 0 && (
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '10px',
+                          background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'var(--accent)',
+                          color: '#fff',
+                          lineHeight: 1.2,
+                          minWidth: '18px',
+                          textAlign: 'center'
+                        }}>
+                          {pendingTasks}
+                        </span>
+                      )}
+                      {tool.id === 'week-calendar' && (
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '10px',
+                          background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'rgba(168, 85, 247, 0.15)',
+                          color: activeToolId === tool.id ? '#fff' : 'var(--accent)',
+                          lineHeight: 1.2
+                        }}>
+                          W{currentWeekNumber}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
