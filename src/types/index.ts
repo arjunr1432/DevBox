@@ -18,7 +18,8 @@ export type ToolId =
   | 'xml-formatter'
   | 'yaml-json'
   | 'cron-parser'
-  | 'qr-generator';
+  | 'qr-generator'
+  | 'password-manager';
 
 export type ToolCategory =
   | 'dashboard'

@@ -8,6 +8,7 @@ import {
   Clock,
   Link,
   Key,
+  KeyRound,
   Terminal,
   Fingerprint,
   Palette,
@@ -52,6 +53,7 @@ import { XmlFormatter } from './components/tools/XmlFormatter';
 import { YamlJsonConverter } from './components/tools/YamlJsonConverter';
 import { CronParser } from './components/tools/CronParser';
 import { QrCodeGenerator } from './components/tools/QrCodeGenerator';
+import { PasswordManager } from './components/tools/PasswordManager';
 
 const TOOLS: Tool[] = [
   {
@@ -154,10 +156,17 @@ const TOOLS: Tool[] = [
   },
   {
     id: 'uuid-generator',
-    name: 'UUID & Key Generator',
-    description: 'Batch generate UUID v4 and strong keys',
+    name: 'UUID Generator',
+    description: 'Batch generate cryptographically secure UUID v4 tokens',
     category: 'cryptography',
     icon: 'Grid'
+  },
+  {
+    id: 'password-manager',
+    name: 'Password Generator & Vault',
+    description: 'Generate strong passwords and store them securely with AES-GCM encryption',
+    category: 'cryptography',
+    icon: 'KeyRound'
   },
   {
     id: 'color-tool',
@@ -297,6 +306,7 @@ function App() {
       case 'Clock': return <Clock size={size} className="menu-icon" />;
       case 'Link': return <Link size={size} className="menu-icon" />;
       case 'Key': return <Key size={size} className="menu-icon" />;
+      case 'KeyRound': return <KeyRound size={size} className="menu-icon" />;
       case 'Terminal': return <Terminal size={size} className="menu-icon" />;
       case 'Fingerprint': return <Fingerprint size={size} className="menu-icon" />;
       case 'Palette': return <Palette size={size} className="menu-icon" />;
@@ -349,6 +359,7 @@ function App() {
       case 'yaml-json': return <YamlJsonConverter />;
       case 'cron-parser': return <CronParser />;
       case 'qr-generator': return <QrCodeGenerator />;
+      case 'password-manager': return <PasswordManager />;
       default: return <JsonFormatter />;
     }
   };
