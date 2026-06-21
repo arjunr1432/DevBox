@@ -186,13 +186,13 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
   };
 
   return (
-    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="tool-header">
         <h1>QR Code Generator</h1>
         <p>Generate high-quality, customized QR codes offline for URLs, raw texts, Wi-Fi networks, and contact cards.</p>
       </div>
 
-      <div className="tool-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="tool-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {/* Navigation Tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '2px', gap: '8px' }}>
           <button
@@ -222,58 +222,58 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
         </div>
 
         {/* Builder Area & Canvas Area */}
-        <div style={{ display: 'flex', gap: '20px', flexGrow: 1, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           {/* Builder Form (Left) */}
-          <div style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ flex: '1 1 340px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
             {/* Form Fields based on tab */}
             {activeTab === 'text' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexGrow: 1 }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Standard Text or URL</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>Standard Text or URL</label>
                 <textarea
                   className="textarea-control"
                   placeholder="Enter URL or text to encode..."
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  style={{ flexGrow: 1, minHeight: '160px', resize: 'none' }}
+                  style={{ minHeight: '100px', resize: 'vertical' }}
                 />
               </div>
             )}
 
             {activeTab === 'wifi' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>SSID (Network Name)</label>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>SSID (Network Name)</label>
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     placeholder="SSID name"
                     value={wifiSsid}
                     onChange={(e) => setWifiSsid(e.target.value)}
-                    style={{ height: '36px', padding: '0 8px', fontSize: '13px', width: '100%' }}
+                    style={{ height: '30px', padding: '0 8px', fontSize: '12px', width: '100%' }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Password</label>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Password</label>
                   <input
                     type="password"
-                    className="textarea-control"
+                    className="input-control"
                     placeholder="WPA/WPA2/WEP Password"
                     value={wifiPassword}
                     onChange={(e) => setWifiPassword(e.target.value)}
-                    style={{ height: '36px', padding: '0 8px', fontSize: '13px', width: '100%' }}
+                    style={{ height: '30px', padding: '0 8px', fontSize: '12px', width: '100%' }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '4px' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '2px' }}>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Security</label>
+                    <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Security</label>
                     <select
                       className="select-control"
                       value={wifiSecurity}
                       onChange={(e) => setWifiSecurity(e.target.value as 'WPA' | 'WEP' | 'nopass')}
-                      style={{ padding: '6px 10px', fontSize: '13px', width: '120px' }}
+                      style={{ padding: '4px 8px', fontSize: '12px', width: '120px', height: '30px' }}
                     >
                       <option value="WPA">WPA/WPA2</option>
                       <option value="WEP">WEP</option>
@@ -281,7 +281,7 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
                     </select>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '100%', alignSelf: 'flex-end', paddingBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '30px', alignSelf: 'flex-end' }}>
                     <input
                       type="checkbox"
                       id="wifi-hidden"
@@ -289,113 +289,113 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
                       onChange={(e) => setWifiHidden(e.target.checked)}
                       style={{ cursor: 'pointer' }}
                     />
-                    <label htmlFor="wifi-hidden" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}>Hidden SSID</label>
+                    <label htmlFor="wifi-hidden" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}>Hidden SSID</label>
                   </div>
                 </div>
               </div>
             )}
 
             {activeTab === 'vcard' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>First Name</label>
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardFirst}
                     onChange={(e) => setVcardFirst(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Last Name</label>
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardLast}
                     onChange={(e) => setVcardLast(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
                 <div style={{ gridColumn: 'span 2' }}>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Company</label>
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardOrg}
                     onChange={(e) => setVcardOrg(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Phone Number</label>
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardPhone}
                     onChange={(e) => setVcardPhone(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Email</label>
                   <input
                     type="email"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardEmail}
                     onChange={(e) => setVcardEmail(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
                 <div style={{ gridColumn: 'span 2' }}>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Website URL</label>
                   <input
                     type="url"
-                    className="textarea-control"
+                    className="input-control"
                     value={vcardUrl}
                     onChange={(e) => setVcardUrl(e.target.value)}
-                    style={{ height: '32px', padding: '0 8px', fontSize: '12px', width: '100%' }}
+                    style={{ height: '28px', padding: '0 8px', fontSize: '11px', width: '100%' }}
                   />
                 </div>
               </div>
             )}
 
             {/* Customization Details */}
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Foreground Color</label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Foreground Color</label>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <input
                     type="color"
                     value={fgColor}
                     onChange={(e) => setFgColor(e.target.value)}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, width: '28px', height: '28px' }}
+                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, width: '26px', height: '26px' }}
                   />
                   <input
                     type="text"
-                    className="textarea-control"
+                    className="input-control"
                     value={fgColor}
                     onChange={(e) => setFgColor(e.target.value)}
-                    style={{ height: '28px', width: '70px', padding: '2px 4px', fontSize: '11px', textAlign: 'center', fontFamily: 'monospace' }}
+                    style={{ height: '26px', width: '70px', padding: '2px 4px', fontSize: '11px', textAlign: 'center', fontFamily: 'monospace' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Background Color</label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Background Color</label>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <input
                     type="color"
                     value={bgColor === 'transparent' ? '#ffffff' : bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
                     disabled={bgColor === 'transparent'}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, width: '28px', height: '28px' }}
+                    style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, width: '26px', height: '26px' }}
                   />
                   <select
                     className="select-control"
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
-                    style={{ height: '28px', padding: '0 4px', fontSize: '11px' }}
+                    style={{ height: '26px', padding: '0 4px', fontSize: '11px' }}
                   >
                     <option value="#ffffff">White (#fff)</option>
                     <option value="#f3f4f6">Light Gray</option>
@@ -406,12 +406,12 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
               </div>
 
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Error Correction</label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Error Correction</label>
                 <select
                   className="select-control"
                   value={errorLevel}
                   onChange={(e) => setErrorLevel(e.target.value as 'L' | 'M' | 'Q' | 'H')}
-                  style={{ height: '28px', padding: '0 4px', fontSize: '11px', width: '80px' }}
+                  style={{ height: '26px', padding: '0 4px', fontSize: '11px', width: '80px' }}
                 >
                   <option value="L">L (7%)</option>
                   <option value="M">M (15%)</option>
@@ -421,12 +421,12 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
               </div>
 
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Size</label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Size</label>
                 <select
                   className="select-control"
                   value={size}
                   onChange={(e) => setSize(parseInt(e.target.value, 10))}
-                  style={{ height: '28px', padding: '0 4px', fontSize: '11px', width: '80px' }}
+                  style={{ height: '26px', padding: '0 4px', fontSize: '11px', width: '80px' }}
                 >
                   <option value={128}>128 px</option>
                   <option value={256}>256 px</option>
@@ -436,11 +436,11 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
             </div>
 
             {/* Utility buttons */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-              <button className="btn btn-secondary" onClick={handleLoadSample} style={{ padding: '8px 12px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <button className="btn btn-secondary" onClick={handleLoadSample} style={{ padding: '6px 12px', fontSize: '12px' }}>
                 Load Sample
               </button>
-              <button className="btn btn-secondary" onClick={handleClear} style={{ padding: '8px 12px', fontSize: '12px' }}>
+              <button className="btn btn-secondary" onClick={handleClear} style={{ padding: '6px 12px', fontSize: '12px' }}>
                 Clear Form
               </button>
             </div>
@@ -448,7 +448,7 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
           </div>
 
           {/* Canvas Preview Area (Right) */}
-          <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 255, 255, 0.01)', padding: '20px', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.06)' }}>
+          <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 255, 255, 0.01)', padding: '16px', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.06)', minHeight: '260px' }}>
             
             {/* Canvas Container */}
             <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
