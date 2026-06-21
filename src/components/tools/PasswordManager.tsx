@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  KeyRound,
   RefreshCw,
   Eye,
   EyeOff,
@@ -11,7 +10,12 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  Check
+  Check,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 
 // Web Crypto Encryption Helpers
@@ -102,22 +106,10 @@ const generatePassword = (
   let pool = '';
   let pwd = '';
 
-  if (config.uppercase) {
-    pool += upper;
-    pwd += upper[Math.floor(Math.random() * upper.length)];
-  }
-  if (config.lowercase) {
-    pool += lower;
-    pwd += lower[Math.floor(Math.random() * lower.length)];
-  }
-  if (config.numbers) {
-    pool += num;
-    pwd += num[Math.floor(Math.random() * num.length)];
-  }
-  if (config.symbols) {
-    pool += sym;
-    pwd += sym[Math.floor(Math.random() * sym.length)];
-  }
+  if (config.uppercase) { pool += upper; pwd += upper[Math.floor(Math.random() * upper.length)]; }
+  if (config.lowercase) { pool += lower; pwd += lower[Math.floor(Math.random() * lower.length)]; }
+  if (config.numbers)   { pool += num;   pwd += num[Math.floor(Math.random() * num.length)]; }
+  if (config.symbols)   { pool += sym;   pwd += sym[Math.floor(Math.random() * sym.length)]; }
 
   if (pool.length === 0) return '';
 
@@ -137,7 +129,6 @@ interface VaultItem {
   timestamp: number;
 }
 
-// Factory helper outside the component to keep rendering pure from Date/Math.random (resolves react-hooks/purity lint)
 const createVaultItem = (website: string, username: string, password: string): VaultItem => {
   const randomId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2);
   return {
@@ -149,90 +140,86 @@ const createVaultItem = (website: string, username: string, password: string): V
   };
 };
 
-// Password strength calculator outside the component (resolves react-hooks/set-state-in-effect lint)
 const calculateStrength = (password: string) => {
-  if (!password) {
-    return { score: 0, label: 'Weak', class: 'weak' as const };
-  }
+  if (!password) return { score: 0, label: 'Weak', class: 'weak' as const };
 
   let score = 0;
   const len = password.length;
-
-  if (len >= 8) score += 1;
+  if (len >= 8)  score += 1;
   if (len >= 12) score += 1;
   if (len >= 16) score += 1;
 
   let typesCount = 0;
-  if (/[A-Z]/.test(password)) typesCount++;
-  if (/[a-z]/.test(password)) typesCount++;
-  if (/[0-9]/.test(password)) typesCount++;
+  if (/[A-Z]/.test(password))      typesCount++;
+  if (/[a-z]/.test(password))      typesCount++;
+  if (/[0-9]/.test(password))      typesCount++;
   if (/[^A-Za-z0-9]/.test(password)) typesCount++;
-
   score += typesCount;
 
   let label = 'Weak';
   let labelClass: 'weak' | 'medium' | 'strong' = 'weak';
+  if (score >= 6) { label = 'Strong';   labelClass = 'strong'; }
+  else if (score >= 4) { label = 'Moderate'; labelClass = 'medium'; }
 
-  if (score >= 6) {
-    label = 'Strong';
-    labelClass = 'strong';
-  } else if (score >= 4) {
-    label = 'Moderate';
-    labelClass = 'medium';
-  }
-
-  return {
-    score,
-    label,
-    class: labelClass,
-  };
+  return { score, label, class: labelClass };
 };
 
+// Vault modal modes
+type VaultModalMode = 'none' | 'setup' | 'unlock' | 'reset';
+
 export const PasswordManager: React.FC = () => {
-  // Vault state
-  const [isVaultSetup, setIsVaultSetup] = useState(() => {
-    try {
-      return !!localStorage.getItem('devbox-password-verification');
-    } catch {
-      return false;
-    }
+  // ─── Generator State ───────────────────────────────────────────────────────
+  const [passLength, setPassLength] = useState(16);
+  const [passConfig, setPassConfig] = useState({
+    uppercase: true, lowercase: true, numbers: true, symbols: true,
   });
+  const [generatedPassword, setGeneratedPassword] = useState(() =>
+    generatePassword(16, { uppercase: true, lowercase: true, numbers: true, symbols: true })
+  );
+  const [copyFeedbackGen, setCopyFeedbackGen] = useState(false);
+
+  // ─── Vault State ───────────────────────────────────────────────────────────
+  const [isVaultSetup, setIsVaultSetup] = useState(() => {
+    try { return !!localStorage.getItem('devbox-password-verification'); }
+    catch { return false; }
+  });
+  const [isVaultOpen, setIsVaultOpen] = useState(false);
   const [isVaultUnlocked, setIsVaultUnlocked] = useState(false);
   const [vaultKey, setVaultKey] = useState('');
-  
-  // Input fields for unlock / setup
+  const [savedPasswords, setSavedPasswords] = useState<VaultItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // ─── Modal State ──────────────────────────────────────────────────────────
+  const [modalMode, setModalMode] = useState<VaultModalMode>('none');
   const [setupPassword, setSetupPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [unlockPassword, setUnlockPassword] = useState('');
   const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
 
-  // Unlocked state variables
-  const [savedPasswords, setSavedPasswords] = useState<VaultItem[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Generator State
-  const [passLength, setPassLength] = useState(16);
-  const [passConfig, setPassConfig] = useState({
-    uppercase: true,
-    lowercase: true,
-    numbers: true,
-    symbols: true,
-  });
-  const [generatedPassword, setGeneratedPassword] = useState('');
-
-  // Save State
+  // ─── Save Form State ───────────────────────────────────────────────────────
+  const [showSaveForm, setShowSaveForm] = useState(false);
   const [websiteName, setWebsiteName] = useState('');
   const [username, setUsername] = useState('');
-  const [customPassword, setCustomPassword] = useState('');
+  const [savePassword, setSavePassword] = useState('');
 
-  // UI state feedback
+  // ─── Item UI State ─────────────────────────────────────────────────────────
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
-  const [copyFeedback, setCopyFeedback] = useState<Record<string, 'username' | 'password' | 'general' | null>>({});
+  const [copyFeedback, setCopyFeedback] = useState<Record<string, 'username' | 'password' | null>>({});
+  const [saveFeedback, setSaveFeedback] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  // Seed save password with generated password when save form opens
+  useEffect(() => {
+    if (showSaveForm) {
+      setSavePassword(generatedPassword);
+    }
+  }, [showSaveForm, generatedPassword]);
 
   const handleGenerate = () => {
     const pwd = generatePassword(passLength, passConfig);
     setGeneratedPassword(pwd);
-    setCustomPassword(pwd);
   };
 
   const handleConfigChange = (key: 'uppercase' | 'lowercase' | 'numbers' | 'symbols') => {
@@ -240,79 +227,76 @@ export const PasswordManager: React.FC = () => {
     const activeCount = Object.values(nextConfig).filter(Boolean).length;
     if (activeCount > 0) {
       setPassConfig(nextConfig);
-      const pwd = generatePassword(passLength, nextConfig);
-      setGeneratedPassword(pwd);
-      setCustomPassword(pwd);
+      setGeneratedPassword(generatePassword(passLength, nextConfig));
     }
   };
 
-  // Master password setup
+  const copyGenerated = () => {
+    navigator.clipboard.writeText(generatedPassword);
+    setCopyFeedbackGen(true);
+    setTimeout(() => setCopyFeedbackGen(false), 2000);
+  };
+
+  // ─── Vault Auth ────────────────────────────────────────────────────────────
+  const openVaultModal = () => {
+    setAuthError('');
+    setSetupPassword('');
+    setConfirmPassword('');
+    setUnlockPassword('');
+    setModalMode(isVaultSetup ? 'unlock' : 'setup');
+  };
+
+  const closeModal = () => {
+    setModalMode('none');
+    setAuthError('');
+    setSetupPassword('');
+    setConfirmPassword('');
+    setUnlockPassword('');
+  };
+
   const handleSetupVault = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (!setupPassword) {
-      setAuthError('Master Password is required.');
-      return;
-    }
-    if (setupPassword.length < 8) {
-      setAuthError('Master Password must be at least 8 characters long.');
-      return;
-    }
-    if (setupPassword !== confirmPassword) {
-      setAuthError('Passwords do not match.');
-      return;
-    }
+    if (!setupPassword) { setAuthError('Master Password is required.'); return; }
+    if (setupPassword.length < 8) { setAuthError('Must be at least 8 characters.'); return; }
+    if (setupPassword !== confirmPassword) { setAuthError('Passwords do not match.'); return; }
 
+    setAuthLoading(true);
     try {
-      // Encrypt verification token using master password
-      const verificationVal = 'devbox-verification-token';
-      const encryptedVerification = await encryptData(verificationVal, setupPassword);
+      const encryptedVerification = await encryptData('devbox-verification-token', setupPassword);
       localStorage.setItem('devbox-password-verification', encryptedVerification);
-
-      // Create an empty encrypted passwords list
       const encryptedEmptyList = await encryptData(JSON.stringify([]), setupPassword);
       localStorage.setItem('devbox-saved-passwords', encryptedEmptyList);
 
       setVaultKey(setupPassword);
       setSavedPasswords([]);
       setIsVaultUnlocked(true);
-      setIsVaultSetup(true);
-      setSetupPassword('');
-      setConfirmPassword('');
-      
-      // Seed initial password
-      const pwd = generatePassword(passLength, passConfig);
-      setGeneratedPassword(pwd);
-      setCustomPassword(pwd);
+      setIsVaultOpen(true);
+      closeModal();
     } catch {
       setAuthError('Failed to initialize the secure vault.');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
-  // Master password unlock
   const handleUnlockVault = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (!unlockPassword) {
-      setAuthError('Please enter your Master Password.');
-      return;
-    }
+    if (!unlockPassword) { setAuthError('Please enter your Master Password.'); return; }
 
+    setAuthLoading(true);
     try {
       const encryptedVerification = localStorage.getItem('devbox-password-verification');
-      if (!encryptedVerification) {
-        setAuthError('Vault verification missing. Resetting vault is required.');
-        return;
-      }
+      if (!encryptedVerification) { setAuthError('Vault verification missing.'); setAuthLoading(false); return; }
 
-      // Verify master password
       const verifiedToken = await decryptData(encryptedVerification, unlockPassword);
       if (verifiedToken !== 'devbox-verification-token') {
         setAuthError('Incorrect Master Password. Please try again.');
+        setAuthLoading(false);
         return;
       }
 
-      // Load and decrypt passwords
       const encryptedPasswords = localStorage.getItem('devbox-saved-passwords');
       if (encryptedPasswords) {
         const decryptedListStr = await decryptData(encryptedPasswords, unlockPassword);
@@ -323,480 +307,797 @@ export const PasswordManager: React.FC = () => {
 
       setVaultKey(unlockPassword);
       setIsVaultUnlocked(true);
-      setUnlockPassword('');
-
-      // Seed initial password
-      const pwd = generatePassword(passLength, passConfig);
-      setGeneratedPassword(pwd);
-      setCustomPassword(pwd);
+      setIsVaultOpen(true);
+      closeModal();
     } catch {
       setAuthError('Incorrect Master Password. Please try again.');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
-  // Lock vault
   const handleLockVault = () => {
     setVaultKey('');
     setSavedPasswords([]);
     setIsVaultUnlocked(false);
     setSearchQuery('');
-    setWebsiteName('');
-    setUsername('');
-    setCustomPassword('');
-    setGeneratedPassword('');
+    setShowSaveForm(false);
   };
 
-  // Save new password
+  // ─── Reset Vault ──────────────────────────────────────────────────────────
+  const handleResetVault = () => {
+    try {
+      localStorage.removeItem('devbox-password-verification');
+      localStorage.removeItem('devbox-saved-passwords');
+    } catch { /* ignore */ }
+
+    // Reset all vault state
+    setVaultKey('');
+    setSavedPasswords([]);
+    setIsVaultUnlocked(false);
+    setIsVaultOpen(false);
+    setIsVaultSetup(false);
+    setSearchQuery('');
+    setShowSaveForm(false);
+    setResetConfirmText('');
+    closeModal();
+  };
+
+
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!websiteName.trim()) {
-      alert('Please enter a website name.');
-      return;
-    }
-    if (!customPassword) {
-      alert('Please enter or generate a password to save.');
-      return;
-    }
+    if (!websiteName.trim()) { alert('Please enter a website name.'); return; }
+    if (!savePassword)       { alert('Please enter a password to save.'); return; }
 
-    const newItem = createVaultItem(websiteName, username, customPassword);
+    const newItem = createVaultItem(websiteName, username, savePassword);
     const updatedList = [newItem, ...savedPasswords];
 
     try {
       const encryptedDataStr = await encryptData(JSON.stringify(updatedList), vaultKey);
       localStorage.setItem('devbox-saved-passwords', encryptedDataStr);
       setSavedPasswords(updatedList);
-
-      // Reset form fields
       setWebsiteName('');
       setUsername('');
-      handleGenerate(); // Generate a new one for next usage
-      
-      // Temporary success animation feedback
-      showCopyFeedback('save-btn', 'general');
+      setSavePassword(generatedPassword);
+      setShowSaveForm(false);
+      setSaveFeedback(true);
+      setTimeout(() => setSaveFeedback(false), 2000);
     } catch {
       alert('Failed to securely save password to vault.');
     }
   };
 
-  // Delete password
+  // ─── Delete Password ───────────────────────────────────────────────────────
   const handleDeletePassword = async (id: string) => {
-    if (!window.confirm('Are you sure you want to permanently delete this saved password?')) {
-      return;
-    }
-
     const updatedList = savedPasswords.filter(item => item.id !== id);
-
     try {
       const encryptedDataStr = await encryptData(JSON.stringify(updatedList), vaultKey);
       localStorage.setItem('devbox-saved-passwords', encryptedDataStr);
       setSavedPasswords(updatedList);
+      setPendingDeleteId(null);
     } catch {
-      alert('Failed to update vault after deletion.');
+      setPendingDeleteId(null);
     }
   };
 
-  // Copy to clipboard with success check mark
-  const handleCopyToClipboard = (text: string, id: string, fieldType: 'username' | 'password' | 'general') => {
+  const handleCopyToClipboard = (text: string, id: string, fieldType: 'username' | 'password') => {
     navigator.clipboard.writeText(text);
-    showCopyFeedback(id, fieldType);
-  };
-
-  const showCopyFeedback = (id: string, fieldType: 'username' | 'password' | 'general') => {
     setCopyFeedback(prev => ({ ...prev, [id]: fieldType }));
-    setTimeout(() => {
-      setCopyFeedback(prev => ({ ...prev, [id]: null }));
-    }, 2000);
+    setTimeout(() => setCopyFeedback(prev => ({ ...prev, [id]: null })), 2000);
   };
 
   const togglePasswordVisibility = (id: string) => {
     setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Filter passwords
   const filteredPasswords = savedPasswords.filter(
     item =>
       item.website.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Compute password strength on the fly (pure rendering)
-  const currentPassword = customPassword || generatedPassword;
-  const passwordStrength = calculateStrength(currentPassword);
+  const passwordStrength = calculateStrength(generatedPassword);
 
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="tool-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1>Password Generator & Vault</h1>
-          <p>Generate highly secure keys and store credentials locally with military-grade AES-256 encryption.</p>
+    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', overflow: 'hidden' }}>
+      {/* Header */}
+      <div className="tool-header" style={{ flexGrow: 0, flexShrink: 0 }}>
+        <h1>Password Generator</h1>
+        <p>Generate cryptographically secure passwords. Optionally save credentials to your encrypted local vault.</p>
+      </div>
+
+      {/* ── Generator Card ── */}
+      <div className="tool-card" style={{ gap: '16px', flexGrow: 0, flexShrink: 0 }}>
+        {/* Length Slider */}
+        <div className="form-group">
+          <label>
+            Length:&nbsp;
+            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent)' }}>
+              {passLength}
+            </span>
+          </label>
+          <input
+            type="range"
+            min="8"
+            max="64"
+            value={passLength}
+            onChange={(e) => {
+              const len = parseInt(e.target.value, 10);
+              setPassLength(len);
+              setGeneratedPassword(generatePassword(len, passConfig));
+            }}
+            style={{
+              width: '100%',
+              accentColor: 'var(--accent)',
+              cursor: 'pointer',
+              height: '6px',
+              borderRadius: '3px',
+              background: 'var(--border-color)',
+              outline: 'none'
+            }}
+          />
         </div>
-        {isVaultUnlocked && (
-          <button className="btn btn-secondary" onClick={handleLockVault} style={{ gap: '6px' }}>
-            <Lock size={14} />
-            <span>Lock Vault</span>
+
+        {/* Character Options */}
+        <div className="form-group">
+          <label>Character Types</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 24px', marginTop: '6px' }}>
+            {(['uppercase', 'lowercase', 'numbers', 'symbols'] as const).map(key => (
+              <label
+                key={key}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  cursor: 'pointer', fontSize: '13px',
+                  color: 'var(--text-primary)', textTransform: 'none', fontWeight: 'normal'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={passConfig[key]}
+                  onChange={() => handleConfigChange(key)}
+                />
+                <span>
+                  {key === 'uppercase' ? 'Uppercase (A–Z)' :
+                   key === 'lowercase' ? 'Lowercase (a–z)' :
+                   key === 'numbers'   ? 'Numbers (0–9)' :
+                                         'Symbols (!@#$…)'}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Generated Password Output */}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+          <div className="form-group" style={{ flexGrow: 1, margin: 0 }}>
+            <label>Generated Password</label>
+            <div style={{ display: 'flex', position: 'relative', marginTop: '6px' }}>
+              <input
+                type="text"
+                className="input-control"
+                readOnly
+                value={generatedPassword}
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '15px',
+                  paddingRight: '44px',
+                  letterSpacing: '0.04em',
+                  background: 'rgba(14, 11, 22, 0.4)'
+                }}
+              />
+              <button
+                type="button"
+                onClick={copyGenerated}
+                style={{
+                  position: 'absolute', right: '8px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none', border: 'none',
+                  color: copyFeedbackGen ? 'var(--success)' : 'var(--text-secondary)',
+                  cursor: 'pointer', padding: '4px'
+                }}
+                title="Copy to clipboard"
+              >
+                {copyFeedbackGen
+                  ? <Check size={15} className="fade-in" />
+                  : <Copy size={15} />}
+              </button>
+            </div>
+          </div>
+          <button
+            className="btn btn-secondary"
+            onClick={handleGenerate}
+            style={{ height: '40px', padding: '10px 14px', flexShrink: 0 }}
+            title="Regenerate"
+          >
+            <RefreshCw size={14} />
           </button>
+        </div>
+
+        {/* Strength Bar */}
+        {generatedPassword && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>Security Strength</span>
+              <span style={{
+                fontWeight: 700,
+                color: passwordStrength.class === 'strong'
+                  ? 'var(--success)'
+                  : passwordStrength.class === 'medium'
+                  ? 'var(--warning)'
+                  : 'var(--error)'
+              }}>
+                {passwordStrength.label}
+              </span>
+            </div>
+            <div className="strength-bar-container">
+              <div
+                className={`strength-bar ${passwordStrength.class}`}
+                style={{ width: `${(passwordStrength.score / 7) * 100}%` }}
+              />
+            </div>
+          </div>
         )}
       </div>
 
-      {/* 1. Setup Master Password Screen */}
-      {!isVaultUnlocked && !isVaultSetup && (
-        <div className="tool-card" style={{ maxWidth: '480px', margin: '40px auto 0', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'rgba(168, 85, 247, 0.1)', color: 'var(--accent)', marginBottom: '12px' }}>
-              <ShieldCheck size={36} />
+      {/* ── Vault Section ── */}
+      <div className="tool-card" style={{ gap: 0, padding: 0, overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* Vault Header / Toggle */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '14px 18px',
+            cursor: 'pointer',
+            borderBottom: isVaultOpen ? '1px solid var(--border-color)' : 'none',
+            userSelect: 'none'
+          }}
+          onClick={() => {
+            if (!isVaultUnlocked) {
+              if (isVaultOpen) {
+                setIsVaultOpen(false);
+              } else {
+                openVaultModal();
+              }
+            } else {
+              setIsVaultOpen(prev => !prev);
+            }
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '8px',
+              background: isVaultUnlocked ? 'rgba(34, 197, 94, 0.12)' : 'rgba(168, 85, 247, 0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: isVaultUnlocked ? 'var(--success)' : 'var(--accent)'
+            }}>
+              {isVaultUnlocked ? <Unlock size={15} /> : <Lock size={15} />}
             </div>
-            <h2>Create Your Master Password</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: 1.4 }}>
-              To securely lock your passwords, choose a strong master password. All vault items will be encrypted on your device. Without this password, your vault cannot be recovered.
-            </p>
-          </div>
-
-          <form onSubmit={handleSetupVault} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="form-group">
-              <label>Master Password</label>
-              <input
-                type="password"
-                className="input-control"
-                placeholder="Enter strong password (min 8 chars)"
-                value={setupPassword}
-                onChange={(e) => setSetupPassword(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label>Confirm Master Password</label>
-              <input
-                type="password"
-                className="input-control"
-                placeholder="Re-enter password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-
-            {authError && (
-              <div className="feedback-box error">
-                {authError}
-              </div>
-            )}
-
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', marginTop: '4px' }}>
-              Create Secure Vault
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* 2. Unlock Vault Screen */}
-      {!isVaultUnlocked && isVaultSetup && (
-        <div className="tool-card" style={{ maxWidth: '440px', margin: '60px auto 0', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'rgba(168, 85, 247, 0.1)', color: 'var(--accent)', marginBottom: '12px' }}>
-              <Lock size={32} />
-            </div>
-            <h2>Vault is Locked</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px' }}>
-              Enter your Master Password to decrypt and view saved credentials.
-            </p>
-          </div>
-
-          <form onSubmit={handleUnlockVault} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="form-group">
-              <label>Master Password</label>
-              <input
-                type="password"
-                className="input-control"
-                placeholder="Enter Master Password"
-                value={unlockPassword}
-                onChange={(e) => setUnlockPassword(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            {authError && (
-              <div className="feedback-box error">
-                {authError}
-              </div>
-            )}
-
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', marginTop: '4px', gap: '8px' }}>
-              <Unlock size={15} />
-              <span>Unlock Vault</span>
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* 3. Unlocked Workspace */}
-      {isVaultUnlocked && (
-        <div className="tool-card" style={{ gap: '16px', flexGrow: 1, overflow: 'hidden' }}>
-          <div className="split-pane" style={{ height: '100%' }}>
-            
-            {/* Left Pane - Generator and Save Form */}
-            <div className="pane-half" style={{ borderRight: '1px solid var(--border-color)', paddingRight: '20px', overflowY: 'auto' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)', marginBottom: '12px' }}>
-                <KeyRound size={16} style={{ color: 'var(--accent)' }} />
-                <span>Password Generator</span>
-              </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div className="form-group">
-                  <label>Length: <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent)' }}>{passLength}</span></label>
-                  <input
-                    type="range"
-                    min="8"
-                    max="64"
-                    value={passLength}
-                    onChange={(e) => {
-                      const len = parseInt(e.target.value, 10);
-                      setPassLength(len);
-                      const pwd = generatePassword(len, passConfig);
-                      setGeneratedPassword(pwd);
-                      setCustomPassword(pwd);
-                    }}
-                    style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer', height: '6px', borderRadius: '3px', background: 'var(--border-color)', outline: 'none' }}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Characters</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 20px', marginTop: '4px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', textTransform: 'none' }}>
-                      <input type="checkbox" checked={passConfig.uppercase} onChange={() => handleConfigChange('uppercase')} />
-                      <span>Uppercase (A-Z)</span>
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', textTransform: 'none' }}>
-                      <input type="checkbox" checked={passConfig.lowercase} onChange={() => handleConfigChange('lowercase')} />
-                      <span>Lowercase (a-z)</span>
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', textTransform: 'none' }}>
-                      <input type="checkbox" checked={passConfig.numbers} onChange={() => handleConfigChange('numbers')} />
-                      <span>Numbers (0-9)</span>
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', textTransform: 'none' }}>
-                      <input type="checkbox" checked={passConfig.symbols} onChange={() => handleConfigChange('symbols')} />
-                      <span>Symbols (!@#$...)</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginTop: '4px' }}>
-                  <div className="form-group" style={{ flexGrow: 1 }}>
-                    <label>Generated Password</label>
-                    <div style={{ display: 'flex', position: 'relative', marginTop: '4px' }}>
-                      <input
-                        type="text"
-                        className="input-control"
-                        readOnly
-                        value={generatedPassword}
-                        style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', paddingRight: '40px', background: 'rgba(14, 11, 22, 0.4)' }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleCopyToClipboard(generatedPassword, 'gen-pwd', 'general')}
-                        style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
-                        title="Copy to clipboard"
-                      >
-                        {copyFeedback['gen-pwd'] === 'general' ? <Check size={14} className="fade-in" style={{ color: 'var(--success)' }} /> : <Copy size={14} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <button className="btn btn-secondary" onClick={handleGenerate} style={{ height: '40px', padding: '10px 12px' }} title="Generate new password">
-                    <RefreshCw size={14} />
-                  </button>
-                </div>
-
-                {generatedPassword && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Security Strength</span>
-                      <span style={{ fontWeight: 700, color: passwordStrength.class === 'strong' ? 'var(--success)' : passwordStrength.class === 'medium' ? 'var(--warning)' : 'var(--error)' }}>
-                        {passwordStrength.label}
-                      </span>
-                    </div>
-                    <div className="strength-bar-container">
-                      <div className={`strength-bar ${passwordStrength.class}`} style={{ width: `${(passwordStrength.score / 7) * 100}%` }}></div>
-                    </div>
-                  </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Encrypted Vault
+                {isVaultUnlocked && (
+                  <span style={{
+                    marginLeft: '8px', fontSize: '11px', fontWeight: 600,
+                    color: 'var(--success)', background: 'rgba(34,197,94,0.1)',
+                    padding: '2px 8px', borderRadius: '20px'
+                  }}>
+                    Unlocked • {savedPasswords.length} {savedPasswords.length === 1 ? 'entry' : 'entries'}
+                  </span>
+                )}
+                {!isVaultUnlocked && !isVaultSetup && (
+                  <span style={{
+                    marginLeft: '8px', fontSize: '11px', fontWeight: 600,
+                    color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)',
+                    padding: '2px 8px', borderRadius: '20px'
+                  }}>
+                    Not set up
+                  </span>
+                )}
+                {!isVaultUnlocked && isVaultSetup && (
+                  <span style={{
+                    marginLeft: '8px', fontSize: '11px', fontWeight: 600,
+                    color: 'var(--accent)', background: 'rgba(168,85,247,0.1)',
+                    padding: '2px 8px', borderRadius: '20px'
+                  }}>
+                    Locked
+                  </span>
                 )}
               </div>
-
-              {/* Save Form */}
-              <form onSubmit={handleSavePassword} style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Plus size={14} />
-                  <span>Save Password to Vault</span>
-                </h4>
-
-                <div className="form-group">
-                  <label>Website Name / Service</label>
-                  <input
-                    type="text"
-                    className="input-control"
-                    placeholder="e.g. github.com, google.com"
-                    value={websiteName}
-                    onChange={(e) => setWebsiteName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Username / Email (Optional)</label>
-                  <input
-                    type="text"
-                    className="input-control"
-                    placeholder="e.g. user@email.com, user14"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Password to Save</label>
-                  <input
-                    type="text"
-                    className="input-control"
-                    placeholder="Password"
-                    value={customPassword}
-                    onChange={(e) => setCustomPassword(e.target.value)}
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', marginTop: '6px', gap: '8px' }}>
-                  {copyFeedback['save-btn'] === 'general' ? (
-                    <>
-                      <Check size={14} />
-                      <span>Saved Successfully!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheck size={14} />
-                      <span>Save Password Securely</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-
-            {/* Right Pane - Saved Passwords Vault */}
-            <div className="pane-half" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-                  <ShieldCheck size={16} style={{ color: 'var(--success)' }} />
-                  <span>Encrypted Vault ({savedPasswords.length})</span>
-                </h3>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '1px' }}>
+                {isVaultUnlocked
+                  ? 'Click to expand / collapse'
+                  : 'AES-256 encrypted • Click to unlock'}
               </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isVaultUnlocked && (
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => { e.stopPropagation(); handleLockVault(); }}
+                style={{ fontSize: '12px', padding: '5px 10px', gap: '5px', height: 'auto' }}
+              >
+                <Lock size={12} />
+                <span>Lock</span>
+              </button>
+            )}
+            {isVaultOpen ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
+          </div>
+        </div>
 
-              {/* Vault Search */}
-              <div style={{ position: 'relative', marginBottom: '12px' }}>
-                <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={14} />
+        {/* Vault Body (visible when open & unlocked) */}
+        {isVaultOpen && isVaultUnlocked && (
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
+            {/* ── Toolbar Row: Search + Add button ── */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              borderBottom: '1px solid var(--border-color)',
+              background: 'rgba(0,0,0,0.1)',
+              flexShrink: 0
+            }}>
+              {/* Search */}
+              <div style={{ position: 'relative', flex: 1 }}>
+                <Search
+                  size={13}
+                  style={{ position: 'absolute', left: '9px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}
+                />
                 <input
                   type="text"
-                  placeholder="Search websites or usernames..."
+                  placeholder="Search…"
                   className="input-control"
-                  style={{ paddingLeft: '32px' }}
+                  style={{ paddingLeft: '28px', height: '32px', fontSize: '12px' }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
 
-              {/* Vault Items List */}
-              <div style={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
-                {filteredPasswords.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', fontSize: '13px' }}>
-                    {searchQuery ? 'No matching vault items found.' : 'Your secure password vault is empty.'}
+              {/* Add / Saved feedback button */}
+              <button
+                className={saveFeedback ? 'btn btn-secondary' : 'btn btn-primary'}
+                onClick={() => setShowSaveForm(prev => !prev)}
+                style={{ height: '32px', fontSize: '12px', gap: '5px', flexShrink: 0, padding: '0 12px' }}
+              >
+                {saveFeedback
+                  ? <><Check size={12} style={{ color: 'var(--success)' }} /><span>Saved!</span></>
+                  : showSaveForm
+                  ? <><X size={12} /><span>Cancel</span></>
+                  : <><Plus size={12} /><span>Add</span></>}
+              </button>
+            </div>
+
+            {/* ── Inline Save Form (slides in under toolbar) ── */}
+            {showSaveForm && (
+              <form
+                onSubmit={handleSavePassword}
+                style={{
+                  padding: '12px 18px',
+                  borderBottom: '1px solid var(--border-color)',
+                  background: 'rgba(168, 85, 247, 0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  flexShrink: 0
+                }}
+              >
+                {/* Row 1: Website + Username */}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                      Website *
+                    </label>
+                    <input
+                      type="text"
+                      className="input-control"
+                      placeholder="e.g. github.com"
+                      value={websiteName}
+                      onChange={(e) => setWebsiteName(e.target.value)}
+                      required
+                      autoFocus
+                      style={{ height: '34px', fontSize: '13px' }}
+                    />
                   </div>
-                ) : (
-                  filteredPasswords.map(item => {
-                    const isVisible = visiblePasswords[item.id] || false;
-                    const cFeedback = copyFeedback[item.id];
-                    return (
-                      <div
-                        key={item.id}
-                        className="vault-item"
-                        style={{
-                          background: 'var(--bg-card)',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: '8px',
-                          padding: '12px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '8px',
-                          position: 'relative'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
-                            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{item.website}</div>
-                            {item.username && (
-                              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '180px' }}>{item.username}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleCopyToClipboard(item.username, item.id, 'username')}
-                                  style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center' }}
-                                  title="Copy username"
-                                >
-                                  {cFeedback === 'username' ? <Check size={11} style={{ color: 'var(--success)' }} /> : <Copy size={11} />}
-                                </button>
-                              </div>
-                            )}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                      Username / Email
+                    </label>
+                    <input
+                      type="text"
+                      className="input-control"
+                      placeholder="Optional"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      style={{ height: '34px', fontSize: '13px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Password + Save button */}
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                      Password
+                    </label>
+                    <input
+                      type="text"
+                      className="input-control"
+                      placeholder="Password"
+                      value={savePassword}
+                      onChange={(e) => setSavePassword(e.target.value)}
+                      required
+                      style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', height: '34px' }}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ height: '34px', fontSize: '13px', gap: '6px', flexShrink: 0, padding: '0 16px' }}
+                  >
+                    <ShieldCheck size={13} />
+                    <span>Save</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* ── Password List ── */}
+            <div style={{
+              overflowY: 'auto',
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0'
+            }}>
+              {filteredPasswords.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '32px 20px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                  <Shield size={26} style={{ opacity: 0.25, display: 'block', margin: '0 auto 8px' }} />
+                  {searchQuery ? 'No matches found.' : 'No saved passwords yet. Hit Add to save one!'}
+                </div>
+              ) : (
+                filteredPasswords.map((item, idx) => {
+                  const isVisible = visiblePasswords[item.id] || false;
+                  const cFeedback = copyFeedback[item.id];
+                  return (
+                    <div
+                      key={item.id}
+                      className="vault-item"
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto auto auto',
+                        alignItems: 'center',
+                        gap: '0 8px',
+                        padding: '10px 18px',
+                        borderBottom: idx < filteredPasswords.length - 1
+                          ? '1px solid var(--border-color)'
+                          : 'none',
+                        transition: 'background 0.15s'
+                      }}
+                    >
+                      {/* Site + Username */}
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.website}
+                        </div>
+                        {item.username && (
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
+                            {item.username}
                           </div>
-                          
+                        )}
+                      </div>
+
+                      {/* Masked password */}
+                      <div style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '13px',
+                        letterSpacing: isVisible ? 'normal' : '3px',
+                        color: isVisible ? 'var(--text-secondary)' : 'var(--text-muted)',
+                        maxWidth: '160px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        background: 'rgba(0,0,0,0.15)',
+                        padding: '3px 8px',
+                        borderRadius: '5px',
+                        border: '1px solid rgba(255,255,255,0.04)',
+                        userSelect: isVisible ? 'text' : 'none'
+                      }}>
+                        {isVisible ? item.password : '••••••••'}
+                      </div>
+
+                      {/* Action icons */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                        {/* Copy username (if exists) */}
+                        {item.username && (
                           <button
-                            onClick={() => handleDeletePassword(item.id)}
-                            style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--text-muted)' }}
+                            type="button"
+                            onClick={() => handleCopyToClipboard(item.username, item.id, 'username')}
+                            style={{ background: 'none', border: 'none', padding: '5px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', borderRadius: '4px' }}
+                            title="Copy username"
+                          >
+                            {cFeedback === 'username' ? <Check size={12} style={{ color: 'var(--success)' }} /> : <Copy size={12} />}
+                          </button>
+                        )}
+                        {/* Show/hide */}
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility(item.id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', color: 'var(--text-muted)', display: 'flex', borderRadius: '4px' }}
+                          title={isVisible ? 'Hide password' : 'Show password'}
+                        >
+                          {isVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                        </button>
+                        {/* Copy password */}
+                        <button
+                          type="button"
+                          onClick={() => handleCopyToClipboard(item.password, item.id, 'password')}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', color: 'var(--text-muted)', display: 'flex', borderRadius: '4px' }}
+                          title="Copy password"
+                        >
+                          {cFeedback === 'password' ? <Check size={13} style={{ color: 'var(--success)' }} /> : <Copy size={13} />}
+                        </button>
+                        {/* Delete / Inline Confirm */}
+                        {pendingDeleteId === item.id ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => setPendingDeleteId(null)}
+                              style={{
+                                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
+                                cursor: 'pointer', padding: '3px 8px', color: 'var(--text-muted)',
+                                display: 'flex', borderRadius: '4px', fontSize: '11px', alignItems: 'center', gap: '3px'
+                              }}
+                              title="Cancel"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePassword(item.id)}
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239,68,68,0.4)',
+                                cursor: 'pointer', padding: '3px 8px', color: 'var(--error)',
+                                display: 'flex', borderRadius: '4px', fontSize: '11px', alignItems: 'center', gap: '3px',
+                                fontWeight: 600
+                              }}
+                              title="Confirm delete"
+                            >
+                              <Trash2 size={11} />
+                              Delete
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setPendingDeleteId(item.id)}
+                            style={{ background: 'none', border: 'none', padding: '5px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', borderRadius: '4px' }}
                             className="favorite-action-btn"
-                            title="Delete credentials"
+                            title="Delete"
                           >
                             <Trash2 size={13} style={{ color: 'var(--error)' }} />
                           </button>
-                        </div>
-
-                        {/* Password block */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            background: 'rgba(0, 0, 0, 0.15)',
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            border: '1px solid rgba(255,255,255,0.03)'
-                          }}
-                        >
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', letterSpacing: isVisible ? 'normal' : '4px', color: isVisible ? 'var(--text-primary)' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
-                            {isVisible ? item.password : '••••••••••••'}
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <button
-                              type="button"
-                              onClick={() => togglePasswordVisibility(item.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '3px', color: 'var(--text-secondary)' }}
-                              title={isVisible ? 'Hide password' : 'View password'}
-                            >
-                              {isVisible ? <EyeOff size={13} /> : <Eye size={13} />}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleCopyToClipboard(item.password, item.id, 'password')}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '3px', color: 'var(--text-secondary)' }}
-                              title="Copy password"
-                            >
-                              {cFeedback === 'password' ? <Check size={13} style={{ color: 'var(--success)' }} /> : <Copy size={13} />}
-                            </button>
-                          </div>
-                        </div>
+                        )}
                       </div>
-                    );
-                  })
-                )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* ── Auth Modal ── */}
+      {modalMode !== 'none' && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={closeModal}
+        >
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '16px',
+              padding: '28px',
+              width: '100%',
+              maxWidth: '400px',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '10px',
+                  background: modalMode === 'reset'
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(168, 85, 247, 0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: modalMode === 'reset' ? 'var(--error)' : 'var(--accent)'
+                }}>
+                  {modalMode === 'setup'
+                    ? <Shield size={20} />
+                    : modalMode === 'reset'
+                    ? <AlertTriangle size={20} />
+                    : <Lock size={20} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {modalMode === 'setup'
+                      ? 'Create Vault'
+                      : modalMode === 'reset'
+                      ? 'Reset Vault'
+                      : 'Unlock Vault'}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    {modalMode === 'setup'
+                      ? 'Protect your passwords with a master key'
+                      : modalMode === 'reset'
+                      ? 'This action is permanent and irreversible'
+                      : 'Enter your master password to continue'}
+                  </div>
+                </div>
               </div>
+              <button
+                onClick={closeModal}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
             </div>
 
+            {/* Setup Form */}
+            {modalMode === 'setup' && (
+              <form onSubmit={handleSetupVault} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label>Master Password</label>
+                  <input
+                    type="password"
+                    className="input-control"
+                    placeholder="Min. 8 characters"
+                    value={setupPassword}
+                    onChange={(e) => setSetupPassword(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label>Confirm Master Password</label>
+                  <input
+                    type="password"
+                    className="input-control"
+                    placeholder="Re-enter password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                {authError && (
+                  <div className="feedback-box error">{authError}</div>
+                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', height: '42px', marginTop: '4px', gap: '8px' }}
+                  disabled={authLoading}
+                >
+                  {authLoading ? 'Creating…' : <><ShieldCheck size={15} /><span>Create Secure Vault</span></>}
+                </button>
+              </form>
+            )}
+
+            {/* Unlock Form */}
+            {modalMode === 'unlock' && (
+              <form onSubmit={handleUnlockVault} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label>Master Password</label>
+                  <input
+                    type="password"
+                    className="input-control"
+                    placeholder="Enter Master Password"
+                    value={unlockPassword}
+                    onChange={(e) => setUnlockPassword(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                {authError && (
+                  <div className="feedback-box error">{authError}</div>
+                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', height: '42px', marginTop: '4px', gap: '8px' }}
+                  disabled={authLoading}
+                >
+                  {authLoading ? 'Decrypting…' : <><Unlock size={15} /><span>Unlock Vault</span></>}
+                </button>
+                <div style={{ textAlign: 'center', paddingTop: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setAuthError(''); setResetConfirmText(''); setModalMode('reset'); }}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: '12px', color: 'var(--text-muted)',
+                      textDecoration: 'underline', textUnderlineOffset: '3px'
+                    }}
+                  >
+                    Forgot password? Reset vault
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Reset Vault Form */}
+            {modalMode === 'reset' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '10px',
+                  padding: '14px',
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'flex-start'
+                }}>
+                  <AlertTriangle size={18} style={{ color: 'var(--error)', flexShrink: 0, marginTop: '1px' }} />
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <strong style={{ color: 'var(--error)', display: 'block', marginBottom: '4px' }}>This will permanently delete your vault.</strong>
+                    All saved passwords will be erased and cannot be recovered. You will be able to create a new vault afterwards.
+                  </div>
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label style={{ fontSize: '12px' }}>Type <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--error)', letterSpacing: '0.05em' }}>RESET</strong> to confirm</label>
+                  <input
+                    type="text"
+                    className="input-control"
+                    placeholder="Type RESET here"
+                    value={resetConfirmText}
+                    onChange={(e) => setResetConfirmText(e.target.value)}
+                    autoFocus
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => { setModalMode('unlock'); setResetConfirmText(''); }}
+                    style={{ flex: 1, height: '40px', fontSize: '13px' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetVault}
+                    disabled={resetConfirmText !== 'RESET'}
+                    style={{
+                      flex: 1, height: '40px', fontSize: '13px',
+                      background: resetConfirmText === 'RESET' ? 'var(--error)' : 'rgba(239,68,68,0.2)',
+                      color: resetConfirmText === 'RESET' ? '#fff' : 'rgba(239,68,68,0.5)',
+                      border: 'none', borderRadius: '8px',
+                      cursor: resetConfirmText === 'RESET' ? 'pointer' : 'not-allowed',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      transition: 'all 0.2s',
+                      fontWeight: 600
+                    }}
+                  >
+                    <Trash2 size={14} />
+                    Delete & Reset
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

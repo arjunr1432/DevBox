@@ -9,7 +9,7 @@
 > xattr -cr /Applications/DevBox.app
 > ```
 
-DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates 20 essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
+DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates **21 essential tools** for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
 
 Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
 
@@ -45,18 +45,46 @@ Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs complete
 - 🎯 **RegEx Match Tester**: Compile expressions in real-time, highlight matching nodes safely with infinite-loop prevention, and view matches list.
 - ⏰ **Cron Parser & Builder**: Parse cron expressions into human-readable descriptions, construct expressions visually, and predict upcoming runs.
 - 🔒 **Cryptographic Hash Generator**: Generate MD5, SHA-1, SHA-256, and SHA-512 checksums instantly and locally.
-- 🔑 **UUID & Key Generator**: Batch generate UUID v4 values or create strong custom password keys with strength indicators.
+- 🔢 **UUID Generator**: Batch generate UUID v4 values with one-click copy for each.
+- 🔐 **Password Generator & Vault**: Generate cryptographically secure passwords with configurable length and character sets, live strength indicator, and an **optional encrypted local vault** — see details below.
 - 🎨 **Color Converter & Contrast Checker**: Convert colors between HEX, RGB, and HSL spaces. Features a WCAG 2.1 contrast ratio calculator with compliance status badges (AA/AAA).
 - 🔀 **Text Diff Checker**: Compare text snippets side-by-side or inline using line or word diff highlighting.
 - 🔤 **String Case Converter**: Convert text casing between camelCase, snake_case, kebab-case, PascalCase, uppercase, and lowercase.
 - 📝 **Live Markdown Previewer**: Compose Markdown syntax and preview the rendered styled HTML output side-by-side.
-- 📷 **QR Code Generator**: Generate offline QR codes for raw text, URLs, Wi-Fi networks, and contact cards, with custom foreground/background colors and PNG downloads.
+- 📷 **QR Code Generator**: Generate offline QR codes for raw text, URLs, Wi-Fi networks, and contact cards, with custom foreground/background colors.
+
+### 🔐 Password Generator & Encrypted Vault (Detailed)
+
+The password tool is split into two independent zones:
+
+**Generator (always accessible — no auth required)**
+- Configure password length (8–64 chars) via slider
+- Toggle character sets: Uppercase, Lowercase, Numbers, Symbols
+- Real-time security strength indicator (Weak / Moderate / Strong)
+- One-click copy and regenerate
+
+**Encrypted Vault (optional — unlock required)**
+- Collapsible vault section below the generator
+- Click to unlock → prompts for your master password via an in-app modal (no native dialogs)
+- **AES-256-GCM** encryption with **PBKDF2** (SHA-256, 100k iterations) key derivation
+- Passwords are **never stored as plain text** — only encrypted blobs in `localStorage`
+- Save credentials with website name, optional username, and password (pre-filled from generator)
+- Compact scrollable list with inline show/hide, copy username, copy password, and 2-step inline delete confirmation
+- Search/filter saved entries in real time
+- **Forgot password?** — Reset vault option wipes all data and lets you start fresh (requires typing `RESET` to confirm)
+- Lock vault at any time from the vault header
+
+### ⭐ Favorites
+
+- Pin any tool to a **Favorites** section that appears at the top of the sidebar
+- Drag-and-drop to **reorder** favorites however you like
+- Star icon toggles on every tool card — remove from favorites just as easily
 
 ### 🎨 UI & Design
 
 - 🌓 **macOS Light & Dark Themes**: Fully synchronized interface supporting a premium dark glassmorphism layout (default) and a crisp, clean light mode — toggled from the titlebar.
-- �️ **Native macOS Feel**: Custom titlebar with traffic lights, breadcrumb navigation, draggable window, and Electron-aware full-viewport mode.
-- �💾 **Local Persistence**: Task Board and Quick Notes data persists across sessions via localStorage — no server, no account, no data loss.
+- 🖥️ **Native macOS Feel**: Custom titlebar with traffic lights, breadcrumb navigation, draggable window, and Electron-aware full-viewport mode.
+- 💾 **Local Persistence**: Task Board, Quick Notes, Favorites order, and encrypted vault data all persist across sessions via localStorage — no server, no account, no data loss.
 - 🔍 **Tool Search**: Fuzzy search across all tools from the sidebar for quick access.
 
 ---
@@ -68,6 +96,7 @@ Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs complete
 - **Styling**: Vanilla CSS (Responsive variables, glassmorphic blur filters, custom scrollbars, and macOS window styling)
 - **Icons**: Lucide React
 - **Libraries**: `diff` (text diffing), `marked` (markdown), `sql-formatter` (SQL formatting)
+- **Encryption**: Web Crypto API — AES-256-GCM + PBKDF2 (built-in, zero dependencies)
 - **Desktop Shell**: Electron 42 (CommonJS entrypoint using `.cjs`)
 - **Packager**: Electron Packager
 - **Persistence**: localStorage (immediate writes, crash-safe)
@@ -87,7 +116,7 @@ To fix this and open the app, run the following command in your Terminal:
 ```bash
 xattr -cr /Applications/DevBox.app
 ```
-*(If you run the app from your Downloads folder instead, run `xattr -cr ~/Downloads/DevBox.app`)*.
+*(If you run the app from your Downloads folder instead, run `xattr -cr ~/Downloads/DevBox.app`)*
 
 ### Installation Instructions
 1. Download the **`DevBox-macOS.zip`** archive.
@@ -144,6 +173,7 @@ This compiles your static assets and outputs a folder under `dist-app/` matching
 
 DevBox is designed with a **privacy-first** approach:
 - All tools execute **100% locally** in the browser runtime or Electron thread.
-- Your code snippets, passwords, tokens, API configurations, and file uploads never leave your computer's CPU.
-- Task data and notes are stored in localStorage on your machine — never synced or transmitted anywhere.
-- Fully operational offline.
+- Your code snippets, passwords, tokens, API configurations, and file uploads **never leave your computer's CPU**.
+- Vault passwords are encrypted with **AES-256-GCM** using a key derived from your master password — even the app itself cannot read them without your key.
+- Task data, notes, and favorites are stored in localStorage on your machine — never synced or transmitted anywhere.
+- Fully operational **offline**.
