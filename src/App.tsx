@@ -18,7 +18,9 @@ import {
   FileCode,
   FileEdit,
   CalendarDays,
-  ListTodo
+  ListTodo,
+  ArrowLeftRight,
+  QrCode
 } from 'lucide-react';
 import type { Tool, ToolId, ToolCategory } from './types';
 
@@ -44,6 +46,9 @@ import { SqlFormatter } from './components/tools/SqlFormatter';
 import { HtmlEncoder } from './components/tools/HtmlEncoder';
 import { MarkdownPreview } from './components/tools/MarkdownPreview';
 import { XmlFormatter } from './components/tools/XmlFormatter';
+import { YamlJsonConverter } from './components/tools/YamlJsonConverter';
+import { CronParser } from './components/tools/CronParser';
+import { QrCodeGenerator } from './components/tools/QrCodeGenerator';
 
 const TOOLS: Tool[] = [
   {
@@ -103,6 +108,13 @@ const TOOLS: Tool[] = [
     icon: 'Link'
   },
   {
+    id: 'yaml-json',
+    name: 'YAML ↔ JSON Converter',
+    description: 'Convert between YAML and JSON format bidirectional',
+    category: 'converters',
+    icon: 'ArrowLeftRight'
+  },
+  {
     id: 'html-encoder',
     name: 'HTML Entity Encoder',
     description: 'Escape and unescape HTML entity markup',
@@ -122,6 +134,13 @@ const TOOLS: Tool[] = [
     description: 'Test patterns and match groups in real-time',
     category: 'decoders',
     icon: 'Terminal'
+  },
+  {
+    id: 'cron-parser',
+    name: 'Cron Parser & Builder',
+    description: 'Parse cron expressions and visually build schedules',
+    category: 'decoders',
+    icon: 'Clock'
   },
   {
     id: 'hash-generator',
@@ -164,6 +183,13 @@ const TOOLS: Tool[] = [
     description: 'Live markdown rendering to styled HTML',
     category: 'dev-helpers',
     icon: 'FileEdit'
+  },
+  {
+    id: 'qr-generator',
+    name: 'QR Code Generator',
+    description: 'Generate offline QR codes for text, Wi-Fi, and contacts',
+    category: 'dev-helpers',
+    icon: 'QrCode'
   }
 ];
 
@@ -233,6 +259,8 @@ function App() {
       case 'Database': return <Database size={size} className="menu-icon" />;
       case 'FileCode': return <FileCode size={size} className="menu-icon" />;
       case 'FileEdit': return <FileEdit size={size} className="menu-icon" />;
+      case 'ArrowLeftRight': return <ArrowLeftRight size={size} className="menu-icon" />;
+      case 'QrCode': return <QrCode size={size} className="menu-icon" />;
       default: return <Terminal size={size} className="menu-icon" />;
     }
   };
@@ -271,6 +299,9 @@ function App() {
       case 'case-converter': return <CaseConverter />;
       case 'markdown-preview': return <MarkdownPreview />;
       case 'xml-formatter': return <XmlFormatter />;
+      case 'yaml-json': return <YamlJsonConverter />;
+      case 'cron-parser': return <CronParser />;
+      case 'qr-generator': return <QrCodeGenerator />;
       default: return <JsonFormatter />;
     }
   };

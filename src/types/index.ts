@@ -15,7 +15,10 @@ export type ToolId =
   | 'sql-formatter'
   | 'html-encoder'
   | 'markdown-preview'
-  | 'xml-formatter';
+  | 'xml-formatter'
+  | 'yaml-json'
+  | 'cron-parser'
+  | 'qr-generator';
 
 export type ToolCategory =
   | 'dashboard'

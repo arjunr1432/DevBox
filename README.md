@@ -9,7 +9,7 @@
 > xattr -cr /Applications/DevBox.app
 > ```
 
-DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates 17 essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
+DevBox is a premium, offline-first developer utility suite styled to mimic a native macOS desktop application. It integrates 20 essential tools for day-to-day software development into a single, cohesive, glassmorphic workspace — with a built-in dashboard for task management and calendar planning.
 
 Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs completely locally on your machine with zero external network dependencies, ensuring absolute security for sensitive credentials, JWTs, and code snippets.
 
@@ -39,15 +39,18 @@ Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs complete
 - 📦 **Base64 Converter**: Encode and decode text strings or drag-and-drop files (images, configs) to Base64 and HTML/CSS Data URL streams.
 - ⏰ **Epoch Timestamp Converter**: A live-ticking UNIX timestamp banner with pause/copy functions, and bidirectional translation to UTC, Local, and Relative date formats.
 - 🔗 **URL Encoder & Decoder**: Encode and decode standard text to percent-encoded URI strings, or decode them back.
+- 🔀 **YAML ↔ JSON Converter**: Bidirectional conversion of structures between YAML format and formatted JSON strings, with instant error validation.
 - 🔏 **HTML Entity Encoder**: Escape special HTML control characters to entity strings and decode entities back to plain text.
 - 🔑 **JWT Decoder**: Inspect JWT tokens, automatically dividing Header, Payload, and Signature metadata with expiry alerts and claims verification.
 - 🎯 **RegEx Match Tester**: Compile expressions in real-time, highlight matching nodes safely with infinite-loop prevention, and view matches list.
+- ⏰ **Cron Parser & Builder**: Parse cron expressions into human-readable descriptions, construct expressions visually, and predict upcoming runs.
 - 🔒 **Cryptographic Hash Generator**: Generate MD5, SHA-1, SHA-256, and SHA-512 checksums instantly and locally.
 - 🔑 **UUID & Key Generator**: Batch generate UUID v4 values or create strong custom password keys with strength indicators.
 - 🎨 **Color Converter & Contrast Checker**: Convert colors between HEX, RGB, and HSL spaces. Features a WCAG 2.1 contrast ratio calculator with compliance status badges (AA/AAA).
 - 🔀 **Text Diff Checker**: Compare text snippets side-by-side or inline using line or word diff highlighting.
 - 🔤 **String Case Converter**: Convert text casing between camelCase, snake_case, kebab-case, PascalCase, uppercase, and lowercase.
 - 📝 **Live Markdown Previewer**: Compose Markdown syntax and preview the rendered styled HTML output side-by-side.
+- 📷 **QR Code Generator**: Generate offline QR codes for raw text, URLs, Wi-Fi networks, and contact cards, with custom foreground/background colors and PNG downloads.
 
 ### 🎨 UI & Design
 
