@@ -20,7 +20,10 @@ import {
   CalendarDays,
   ListTodo,
   ArrowLeftRight,
-  QrCode
+  QrCode,
+  Star,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import type { Tool, ToolId, ToolCategory } from './types';
 
@@ -213,13 +216,57 @@ function App() {
   // Pending task count from localStorage
   const [pendingTasks, setPendingTasks] = useState(0);
 
+  // Favorites state loaded from localStorage
+  const [favorites, setFavorites] = useState<ToolId[]>(() => {
+    try {
+      const saved = localStorage.getItem('devbox-favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Persist favorites when changed
+  useEffect(() => {
+    try {
+      localStorage.setItem('devbox-favorites', JSON.stringify(favorites));
+    } catch (e) {
+      console.error('Failed to save favorites to localStorage:', e);
+    }
+  }, [favorites]);
+
+  const toggleFavorite = (id: ToolId) => {
+    setFavorites((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const moveFavorite = (id: ToolId, direction: 'up' | 'down') => {
+    setFavorites((prev) => {
+      const index = prev.indexOf(id);
+      if (index === -1) return prev;
+      const nextFavorites = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex >= 0 && targetIndex < nextFavorites.length) {
+        const temp = nextFavorites[index];
+        nextFavorites[index] = nextFavorites[targetIndex];
+        nextFavorites[targetIndex] = temp;
+      }
+      return nextFavorites;
+    });
+  };
+
   useEffect(() => {
     const updatePendingCount = () => {
       try {
         const raw = localStorage.getItem('devbox-todos');
         if (raw) {
           const todos = JSON.parse(raw);
-          setPendingTasks(todos.filter((t: any) => !t.completed).length);
+          setPendingTasks(todos.filter((t: { completed: boolean }) => !t.completed).length);
         }
       } catch { /* ignore */ }
     };
@@ -313,6 +360,19 @@ function App() {
     tool.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get favorited tools that match the search query
+  const favoritedTools = favorites
+    .map(id => TOOLS.find(t => t.id === id))
+    .filter((tool): tool is Tool => {
+      if (!tool) return false;
+      if (!searchQuery) return true;
+      return (
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
+
   // Group filtered tools by category
   const groupedTools = filteredTools.reduce((acc, tool) => {
     if (!acc[tool.category]) {
@@ -380,6 +440,64 @@ function App() {
               />
             </div>
 
+            {/* Favorites Section */}
+            {favoritedTools.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '12px' }}>
+                <div className="sidebar-section-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Star size={10} fill="currentColor" style={{ color: 'var(--text-muted)' }} /> Favorites
+                </div>
+                {favoritedTools.map((tool, index) => (
+                  <div
+                    key={`fav-${tool.id}`}
+                    className={`sidebar-menu-item fav-item ${activeToolId === tool.id ? 'active' : ''}`}
+                    onClick={() => setActiveToolId(tool.id)}
+                  >
+                    {renderIcon(tool.icon)}
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {tool.name}
+                    </span>
+                    
+                    <div className="favorite-actions">
+                      {index > 0 && (
+                        <button
+                          className="favorite-action-btn"
+                          title="Move Up"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveFavorite(tool.id, 'up');
+                          }}
+                        >
+                          <ChevronUp size={14} />
+                        </button>
+                      )}
+                      {index < favoritedTools.length - 1 && (
+                        <button
+                          className="favorite-action-btn"
+                          title="Move Down"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveFavorite(tool.id, 'down');
+                          }}
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                      )}
+                      <button
+                        className="favorite-action-btn remove-btn"
+                        title="Remove from Favorites"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(tool.id);
+                        }}
+                      >
+                        <Star size={13} fill="currentColor" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {categories.map(category => {
               const categoryTools = groupedTools[category];
               if (!categoryTools || categoryTools.length === 0) return null;
@@ -387,44 +505,59 @@ function App() {
               return (
                 <div key={category} style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="sidebar-section-title">{CATEGORY_LABELS[category]}</div>
-                  {categoryTools.map(tool => (
-                    <div
-                      key={tool.id}
-                      className={`sidebar-menu-item ${activeToolId === tool.id ? 'active' : ''}`}
-                      onClick={() => setActiveToolId(tool.id)}
-                    >
-                      {renderIcon(tool.icon)}
-                      <span style={{ flex: 1 }}>{tool.name}</span>
-                      {tool.id === 'todo-list' && pendingTasks > 0 && (
-                        <span style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          padding: '2px 6px',
-                          borderRadius: '10px',
-                          background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'var(--accent)',
-                          color: '#fff',
-                          lineHeight: 1.2,
-                          minWidth: '18px',
-                          textAlign: 'center'
-                        }}>
-                          {pendingTasks}
-                        </span>
-                      )}
-                      {tool.id === 'week-calendar' && (
-                        <span style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          padding: '2px 6px',
-                          borderRadius: '10px',
-                          background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'rgba(168, 85, 247, 0.15)',
-                          color: activeToolId === tool.id ? '#fff' : 'var(--accent)',
-                          lineHeight: 1.2
-                        }}>
-                          W{currentWeekNumber}
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                  {categoryTools.map(tool => {
+                    const isFav = favorites.includes(tool.id);
+                    return (
+                      <div
+                        key={tool.id}
+                        className={`sidebar-menu-item ${activeToolId === tool.id ? 'active' : ''}`}
+                        onClick={() => setActiveToolId(tool.id)}
+                      >
+                        {renderIcon(tool.icon)}
+                        <span style={{ flex: 1 }}>{tool.name}</span>
+                        {tool.id === 'todo-list' && pendingTasks > 0 && (
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            padding: '2px 6px',
+                            borderRadius: '10px',
+                            background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'var(--accent)',
+                            color: '#fff',
+                            lineHeight: 1.2,
+                            minWidth: '18px',
+                            textAlign: 'center',
+                            marginRight: '6px'
+                          }}>
+                            {pendingTasks}
+                          </span>
+                        )}
+                        {tool.id === 'week-calendar' && (
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            padding: '2px 6px',
+                            borderRadius: '10px',
+                            background: activeToolId === tool.id ? 'rgba(255,255,255,0.25)' : 'rgba(168, 85, 247, 0.15)',
+                            color: activeToolId === tool.id ? '#fff' : 'var(--accent)',
+                            lineHeight: 1.2,
+                            marginRight: '6px'
+                          }}>
+                            W{currentWeekNumber}
+                          </span>
+                        )}
+                        <button
+                          className={`sidebar-favorite-toggle-btn ${isFav ? 'is-favorited' : ''}`}
+                          title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(tool.id);
+                          }}
+                        >
+                          <Star size={13} fill={isFav ? 'currentColor' : 'none'} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}

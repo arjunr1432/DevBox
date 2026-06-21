@@ -718,3 +718,116 @@ body {
   margin-bottom: 12px;
   font-style: italic;
 }
+
+/* Sidebar Favorites & Re-arrange styling */
+.sidebar-menu-item {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-favorite-toggle-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
+  color: var(--text-muted);
+}
+
+.sidebar-menu-item:hover .sidebar-favorite-toggle-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-favorite-toggle-btn.is-favorited {
+  opacity: 1;
+  pointer-events: auto;
+  color: #f59e0b; /* Gold star */
+}
+
+.sidebar-favorite-toggle-btn:hover {
+  color: #f59e0b;
+  transform: scale(1.15);
+}
+
+/* Active item adjustments */
+.sidebar-menu-item.active .sidebar-favorite-toggle-btn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebar-menu-item.active .sidebar-favorite-toggle-btn.is-favorited {
+  color: #ffffff;
+}
+
+.sidebar-menu-item.active .sidebar-favorite-toggle-btn:hover {
+  color: #ffffff;
+}
+
+/* Favorites controls (reorder & remove) */
+.favorite-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-speed);
+}
+
+.sidebar-menu-item.fav-item:hover .favorite-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.favorite-action-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  transition: color var(--transition-speed), background var(--transition-speed), transform var(--transition-speed);
+}
+
+.favorite-action-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  transform: scale(1.1);
+}
+
+.favorite-action-btn.remove-btn {
+  color: #f59e0b;
+}
+
+.favorite-action-btn.remove-btn:hover {
+  color: var(--error);
+}
+
+/* Active item details for favorites list */
+.sidebar-menu-item.active .favorite-action-btn {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sidebar-menu-item.active .favorite-action-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-menu-item.active .favorite-action-btn.remove-btn {
+  color: #ffffff;
+}
+
+.sidebar-menu-item.active .favorite-action-btn.remove-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
