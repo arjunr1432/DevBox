@@ -104,20 +104,35 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
   const handleDownload = () => {
     if (!canvasRef.current) return;
     try {
-      canvasRef.current.toBlob((blob) => {
-        if (!blob) {
-          setError('Failed to create image blob');
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `qrcode-${activeTab}-${Date.now()}.png`;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-      }, 'image/png');
+      const filename = `qrcode-${activeTab}-${Date.now()}.png`;
+      const dataUrl = canvasRef.current.toDataURL('image/png');
+
+      const win = window as unknown as {
+        electronAPI?: {
+          saveFile: (filename: string, dataUrl: string) => void;
+        };
+      };
+
+      if (win.electronAPI) {
+        // Use Electron IPC for safe native download dialog
+        win.electronAPI.saveFile(filename, dataUrl);
+      } else {
+        // Fallback for standard browser environments
+        canvasRef.current.toBlob((blob) => {
+          if (!blob) {
+            setError('Failed to create image blob');
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }, 'image/png');
+      }
     } catch (err: unknown) {
       setError('Could not download image: ' + (err instanceof Error ? err.message : String(err)));
     }
