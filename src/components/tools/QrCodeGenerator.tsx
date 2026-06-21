@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Download, Copy, Wifi, User, Globe, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Copy, Wifi, User, Globe, CheckCircle, AlertTriangle } from 'lucide-react';
 import QRCode from 'qrcode';
 
 type QrTab = 'text' | 'wifi' | 'vcard';
@@ -8,6 +8,7 @@ export const QrCodeGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState<QrTab>('text');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // General Text/URL State
@@ -101,49 +102,13 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
     generateQrCode();
   }, [generateQrCode]);
 
-  const handleDownload = () => {
-    if (!canvasRef.current) return;
-    try {
-      const filename = `qrcode-${activeTab}-${Date.now()}.png`;
-      const dataUrl = canvasRef.current.toDataURL('image/png');
-
-      const win = window as unknown as {
-        electronAPI?: {
-          saveFile: (filename: string, dataUrl: string) => void;
-        };
-      };
-
-      if (win.electronAPI) {
-        // Use Electron IPC for safe native download dialog
-        win.electronAPI.saveFile(filename, dataUrl);
-      } else {
-        // Fallback for standard browser environments
-        canvasRef.current.toBlob((blob) => {
-          if (!blob) {
-            setError('Failed to create image blob');
-            return;
-          }
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.download = filename;
-          link.href = url;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(url), 10000);
-        }, 'image/png');
-      }
-    } catch (err: unknown) {
-      setError('Could not download image: ' + (err instanceof Error ? err.message : String(err)));
-    }
-  };
-
   const handleCopy = async () => {
     if (!canvasRef.current) return;
     try {
       const url = canvasRef.current.toDataURL('image/png');
       await navigator.clipboard.writeText(url);
-      alert('Data URL copied to clipboard!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err: unknown) {
       setError('Failed to copy data url: ' + (err instanceof Error ? err.message : String(err)));
     }
@@ -462,13 +427,13 @@ ${vcardUrl ? `URL:${vcardUrl}\n` : ''}END:VCARD`;
 
             {getPayload() && (
               <div style={{ display: 'flex', gap: '8px', marginTop: '16px', width: '100%', justifyContent: 'center' }}>
-                <button className="btn btn-primary" onClick={handleDownload} style={{ padding: '8px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Download size={14} />
-                  <span>Download PNG</span>
-                </button>
-                <button className="btn btn-secondary" onClick={handleCopy} style={{ padding: '8px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  className={`btn ${copied ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={handleCopy}
+                  style={{ padding: '8px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', width: '100%', justifyContent: 'center' }}
+                >
                   <Copy size={14} />
-                  <span>Copy URL</span>
+                  <span>{copied ? 'Copied Data URL!' : 'Copy Data URL'}</span>
                 </button>
               </div>
             )}
