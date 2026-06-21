@@ -38,6 +38,7 @@ Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs complete
 - 🖨️ **SQL Formatter**: Format and indent SQL queries supporting PostgreSQL, MySQL, SQLite, and Standard SQL dialects.
 - 📦 **Base64 Converter**: Encode and decode text strings or drag-and-drop files (images, configs) to Base64 and HTML/CSS Data URL streams.
 - ⏰ **Epoch Timestamp Converter**: A live-ticking UNIX timestamp banner with pause/copy functions, and bidirectional translation to UTC, Local, and Relative date formats.
+- 🔗 **URL Encoder & Decoder**: Encode and decode standard text to percent-encoded URI strings, or decode them back.
 - 🔏 **HTML Entity Encoder**: Escape special HTML control characters to entity strings and decode entities back to plain text.
 - 🔑 **JWT Decoder**: Inspect JWT tokens, automatically dividing Header, Payload, and Signature metadata with expiry alerts and claims verification.
 - 🎯 **RegEx Match Tester**: Compile expressions in real-time, highlight matching nodes safely with infinite-loop prevention, and view matches list.
