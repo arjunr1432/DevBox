@@ -65,8 +65,8 @@ const TOOLS: Tool[] = [
   },
   {
     id: 'week-calendar',
-    name: 'Week Calendar',
-    description: 'Interactive weekly calendar with stats',
+    name: 'Calendar & Time',
+    description: 'Interactive calendar, digital clock, and timezone converter',
     category: 'dashboard',
     icon: 'CalendarDays'
   },

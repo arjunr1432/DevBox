@@ -28,8 +28,8 @@ Built with **React 19, TypeScript 6, Vite 8, and Electron 42**, it runs complete
 ### 📋 Dashboard (Landing Experience)
 
 - ✅ **Task Board** (Default Landing Page): A persistent todo list with priority levels (low/medium/high), color-coded task cards, completion tracking with progress bar, filter by status, and a Quick Notes scratchpad for urgent scribbles. All data is saved to localStorage immediately on every action — survives app crashes, refreshes, and restarts.
-- 📅 **Week Calendar**: Interactive weekly view showing the current week number and day highlights, a fully navigatable monthly calendar with week numbers in every row, year progress bar, quick stats (day of year, days remaining, quarter, leap year), and a today footer bar with live epoch time.
-- 🔔 **Sidebar Badges**: Live pending task count badge on the Task Board and current week number badge on the Week Calendar — always visible in the navigation.
+- 📅 **Calendar & Time**: A compact monthly calendar showing week numbers, today highlight, and custom active date highlights. Includes a live system digital clock, a grid of 4 timezone clocks (1 local system clock + 3 customizable clocks persisted in localStorage), and an interactive timezone converter with base timezone offset matching and quick offset adjustments.
+- 🔔 **Sidebar Badges**: Live pending task count badge on the Task Board and current week number badge on the Calendar & Time page — always visible in the navigation.
 
 ### 🧰 Developer Tools
 
