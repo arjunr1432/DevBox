@@ -411,13 +411,14 @@ export const PasswordManager: React.FC = () => {
       <div className="tool-card" style={{ gap: '16px', flexGrow: 0, flexShrink: 0 }}>
         {/* Length Slider */}
         <div className="form-group">
-          <label>
+          <label htmlFor="password-length">
             Length:&nbsp;
             <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent)' }}>
               {passLength}
             </span>
           </label>
           <input
+            id="password-length"
             type="range"
             min="8"
             max="64"
@@ -446,6 +447,7 @@ export const PasswordManager: React.FC = () => {
             {(['uppercase', 'lowercase', 'numbers', 'symbols'] as const).map(key => (
               <label
                 key={key}
+                htmlFor={`checkbox-${key}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
                   cursor: 'pointer', fontSize: '13px',
@@ -453,6 +455,7 @@ export const PasswordManager: React.FC = () => {
                 }}
               >
                 <input
+                  id={`checkbox-${key}`}
                   type="checkbox"
                   checked={passConfig[key]}
                   onChange={() => handleConfigChange(key)}
@@ -471,9 +474,10 @@ export const PasswordManager: React.FC = () => {
         {/* Generated Password Output */}
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
           <div className="form-group" style={{ flexGrow: 1, margin: 0 }}>
-            <label>Generated Password</label>
+            <label htmlFor="generated-password">Generated Password</label>
             <div style={{ display: 'flex', position: 'relative', marginTop: '6px' }}>
               <input
+                id="generated-password"
                 type="text"
                 className="input-control"
                 readOnly

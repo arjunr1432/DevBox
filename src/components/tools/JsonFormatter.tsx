@@ -61,8 +61,9 @@ export const JsonFormatter: React.FC = () => {
       <div className="tool-card">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Spacing:</span>
+            <label htmlFor="spacing-select" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Spacing:</label>
             <select
+              id="spacing-select"
               className="select-control"
               value={indent}
               onChange={(e) => setIndent(e.target.value)}
@@ -95,9 +96,10 @@ export const JsonFormatter: React.FC = () => {
         <div className="split-pane" style={{ flexGrow: 1, minHeight: '350px' }}>
           <div className="pane-half">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Input JSON</label>
+              <label htmlFor="json-input" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Input JSON</label>
             </div>
             <textarea
+              id="json-input"
               className="textarea-control"
               placeholder="Paste raw JSON here..."
               value={input}
@@ -108,10 +110,11 @@ export const JsonFormatter: React.FC = () => {
 
           <div className="pane-half">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Formatted JSON</label>
+              <label htmlFor="json-output" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Formatted JSON</label>
               <CopyButton text={output} />
             </div>
             <textarea
+              id="json-output"
               className="textarea-control"
               placeholder="Output will appear here..."
               value={output}

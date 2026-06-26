@@ -844,3 +844,18 @@ body {
 .light .vault-item:hover {
   background: rgba(124, 58, 237, 0.05) !important;
 }
+
+/* Accessibility Focus States */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Suppress outline for inputs where custom focus border/shadow is already styled */
+.input-control:focus-visible,
+.select-control:focus-visible,
+.textarea-control:focus-visible,
+.sidebar-search input:focus-visible {
+  outline: none;
+}
+
